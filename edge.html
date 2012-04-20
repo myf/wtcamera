@@ -31,12 +31,13 @@
                 for (var i=0,data_length = input_data.data.length;i<data_length;i=i+4){
                     bw[i/4]=Math.floor((input_data.data[i]+input_data.data[i+1]+input_data.data[i+2])/3)
                 }
-                var smoothed = convolve(bw, input.width, input.height,gaussian,1/273);
+                var small = downsample(bw, input.width, input.height, 2);
+                var smoothed = convolve(small, input.width, input.height,gaussian,1/273);
                 var result = convolve(smoothed, input.width, input.height,sobel,1);
                 apply_to_each_pixel(result, function (x) {
                         //reverse it
                         //threshold
-                        if (x>10) {
+                        if (x>30) {
                             x = 0;
                         }else{
                             x=255;
@@ -80,26 +81,28 @@
                 for (var j = 0;j<input.length;j++){
                         input[j] = call(input[j]);
                 }
-
-
+            }
+            function downsample (input, width, height, factor) {
+                var new_width = width / factor;
+                var new_height = height / factor;
+                var output = new Uint8Array(width*height);
+                for (var j=0;j<new_height;j++) {
+                    for (var i=0;i<new_width;i++) {
+                        var sum = 0;
+                        for (var mj=0;mj<factor;mj++) {
+                            for (var mi=0;mi<factor;mi++) {
+                                sum = sum + input[(((j*factor)+mj)*width)+((i*factor)+mi)];
+                            }
+                        }
+                        var avg = Math.floor(sum / (factor*factor));
+                        output[width*j+i] = avg;
+                        //console.log(j, i);
+                    }
+                }
+                return output;
             }
         </script>
         
     </body>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 </html>

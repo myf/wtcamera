@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    <body>
+        <canvas id="input" width="500" height="500"></canvas>  
+        <canvas id="output" width="500" height="500"></canvas>  
+        
+        <script type="text/javascript">
+            input = document.getElementById('input');
+            output = document.getElementById('output');
+            input_context = input.getContext('2d');
+            output_context = output.getContext('2d');
+            finalImage = output_context.createImageData(input.width,input.height);
+            var img = new Image();
+            img.src = 'cow2.jpg';
+            img.onload = function () {
+                input_context.drawImage(img,0,0)
+                var input_data = input_context.getImageData(0,0,input.width,input.height)
+                var bw = new Uint8Array(input.width*input.height);
+                for (var i=0,data_length = input_data.data.length;i<data_length;i=i+4){
+                    bw[i/4]=Math.floor((input_data.data[i]+input_data.data[i+1]+input_data.data[i+2])/3)
+                }
+                for (var i=0;i<data_length;i=i+4){
+                    finalImage.data[i]=bw[i/4];
+                    finalImage.data[i+1]=bw[i/4];
+                    finalImage.data[i+2]=bw[i/4];
+                    finalImage.data[i+3]=255;
+                }
+                output_context.putImageData(finalImage,0,0);
+
+            }
+
+
+
+
+        </script>
+        
+    </body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>

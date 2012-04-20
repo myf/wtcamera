@@ -7,13 +7,23 @@
         <canvas id="output" width="500" height="500"></canvas>  
         
         <script type="text/javascript">
+            var sobel = [[-1,-1,-1],
+                        [-1,8,-1],
+                        [-1,-1,-1]];
+            var gaussian = [[1,4,7,4,1],
+                            [4,16,26,16,4],
+                            [7,26,41,26,7],
+                            [4,16,26,16,4],
+                            [1,4,7,4,1]]
+
+
             input = document.getElementById('input');
             output = document.getElementById('output');
             input_context = input.getContext('2d');
             output_context = output.getContext('2d');
             finalImage = output_context.createImageData(input.width,input.height);
             var img = new Image();
-            img.src = 'cow2.jpg';
+            img.src = 'obama.jpg';
             img.onload = function () {
                 input_context.drawImage(img,0,0)
                 var input_data = input_context.getImageData(0,0,input.width,input.height)
@@ -21,7 +31,19 @@
                 for (var i=0,data_length = input_data.data.length;i<data_length;i=i+4){
                     bw[i/4]=Math.floor((input_data.data[i]+input_data.data[i+1]+input_data.data[i+2])/3)
                 }
-                var result = edge(bw, input.width, input.height);
+                var smoothed = convolve(bw, input.width, input.height,gaussian,1/273);
+                var result = convolve(smoothed, input.width, input.height,sobel,1);
+                apply_to_each_pixel(result, function (x) {
+                        //reverse it
+                        //threshold
+                        if (x>10) {
+                            x = 0;
+                        }else{
+                            x=255;
+                        }
+                        return x;
+                });
+
                 for (var i=0;i<data_length;i=i+4){
                     finalImage.data[i]=result[i/4];
                     finalImage.data[i+1]=result[i/4];
@@ -32,36 +54,35 @@
                 output_context.putImageData(finalImage,0,0);
 
             }
-            function edge (input, width, height) {
-                var edge = new Uint8Array(width*height);
-                var filter_matrix = [[-1,-1,-1],
-                                     [-1,8,-1],
-                                     [-1,-1,-1]];
-                for (var j=1;j<height-1;j++) {
-                    for (var i= 1;i<width-1;i++) {
+            function convolve (input, width, height, kernel,n_factor) {
+                var k_width = kernel[0].length;
+                var k_height = kernel.length;
+                var output = new Uint8Array(width*height);
+                var width_offset = Math.floor(k_width/2);
+                var height_offset = Math.floor(k_height/2);
+                for (var j=height_offset;j<height-height_offset;j++) {
+                    for (var i= width_offset;i<width-width_offset;i++) {
                         var sum =0;
-                        for (var mj=0;mj<filter_matrix.length;mj++) {
-                            for (var mi=0;mi<filter_matrix[0].length;mi++) {
-                                sum += filter_matrix[mj][mi]*input[width*(j-1+mj)+(i-1+mi)];
-                                //console.log(filter_matrix[mj][mi], input[width*j+i]);
+                        for (var mj=0;mj<kernel.length;mj++) {
+                            for (var mi=0;mi<kernel[0].length;mi++) {
+                                sum += kernel[mj][mi]*input[width*(j-height_offset+mj)+(i-width_offset+mi)];
+                                //console.log(kernel[mj][mi], input[width*j+i]);
                             }
                         }
-                        //threshold
-                        var avg = Math.max(Math.floor(sum/8),0);
-                        enhanced = 255-Math.min(255,avg*50)
-                        edge[width*j+i]= enhanced;
+                        var avg = Math.min(Math.max(Math.floor(sum*n_factor),0),255);
+                        output[width*j+i]= avg;
 
                     }
                 }
-                return edge;
+                return output;
             }
+            function apply_to_each_pixel (input, call) {
+                for (var j = 0;j<input.length;j++){
+                        input[j] = call(input[j]);
+                }
 
 
-
-        </script> 
-
-
-
+            }
         </script>
         
     </body>

@@ -21,16 +21,44 @@
                 for (var i=0,data_length = input_data.data.length;i<data_length;i=i+4){
                     bw[i/4]=Math.floor((input_data.data[i]+input_data.data[i+1]+input_data.data[i+2])/3)
                 }
+                var result = edge(bw, input.width, input.height);
                 for (var i=0;i<data_length;i=i+4){
-                    finalImage.data[i]=bw[i/4];
-                    finalImage.data[i+1]=bw[i/4];
-                    finalImage.data[i+2]=bw[i/4];
+                    finalImage.data[i]=result[i/4];
+                    finalImage.data[i+1]=result[i/4];
+                    finalImage.data[i+2]=result[i/4];
                     finalImage.data[i+3]=255;
+                    
                 }
                 output_context.putImageData(finalImage,0,0);
 
             }
+            function edge (input, width, height) {
+                var edge = new Uint8Array(width*height);
+                var filter_matrix = [[-1,-1,-1],
+                                     [-1,8,-1],
+                                     [-1,-1,-1]];
+                for (var j=1;j<height-1;j++) {
+                    for (var i= 1;i<width-1;i++) {
+                        var sum =0;
+                        for (var mj=0;mj<filter_matrix.length;mj++) {
+                            for (var mi=0;mi<filter_matrix[0].length;mi++) {
+                                sum += filter_matrix[mj][mi]*input[width*(j-1+mj)+(i-1+mi)];
+                                //console.log(filter_matrix[mj][mi], input[width*j+i]);
+                            }
+                        }
+                        //threshold
+                        var avg = Math.max(Math.floor(sum/8),0);
+                        enhanced = 255-Math.min(255,avg*50)
+                        edge[width*j+i]= enhanced;
 
+                    }
+                }
+                return edge;
+            }
+
+
+
+        </script> 
 
 
 

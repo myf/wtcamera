@@ -10,6 +10,8 @@
             var sobel = [[-1,-1,-1],
                         [-1,8,-1],
                         [-1,-1,-1]];
+            var horizontal_gradient =[[-1,0,1]];
+            var vertical_gradient =[[-1],[0],[1]];
             var gaussian = [[1,4,7,4,1],
                             [4,16,26,16,4],
                             [7,26,41,26,7],
@@ -23,7 +25,7 @@
             output_context = output.getContext('2d');
             finalImage = output_context.createImageData(input.width,input.height);
             var img = new Image();
-            img.src = 'obama.jpg';
+            img.src = '700cow.jpg';
             img.onload = function () {
                 input_context.drawImage(img,0,0)
                 var input_data = input_context.getImageData(0,0,input.width,input.height)
@@ -31,13 +33,15 @@
                 for (var i=0,data_length = input_data.data.length;i<data_length;i=i+4){
                     bw[i/4]=Math.floor((input_data.data[i]+input_data.data[i+1]+input_data.data[i+2])/3)
                 }
-                var small = downsample(bw, input.width, input.height, 2);
-                var smoothed = convolve(small, input.width, input.height,gaussian,1/273);
-                var result = convolve(smoothed, input.width, input.height,sobel,1);
+                //var small = downsample(bw, input.width, input.height, 2);
+                var smoothed = convolve(bw, input.width, input.height,gaussian,1/273);
+                var result1 = convolve(smoothed, input.width, input.height,vertical_gradient,1);
+                var result2 = convolve(smoothed, input.width, input.height,horizontal_gradient,1);
+                var result = merge(result1,result2);
                 apply_to_each_pixel(result, function (x) {
                         //reverse it
                         //threshold
-                        if (x>30) {
+                        if (x>25) {
                             x = 0;
                         }else{
                             x=255;
@@ -70,7 +74,7 @@
                                 //console.log(kernel[mj][mi], input[width*j+i]);
                             }
                         }
-                        var avg = Math.min(Math.max(Math.floor(sum*n_factor),0),255);
+                        var avg = Math.min(Math.abs(Math.floor(sum*n_factor)),255);
                         output[width*j+i]= avg;
 
                     }
@@ -82,6 +86,15 @@
                         input[j] = call(input[j]);
                 }
             }
+            function merge (input1, input2) {
+                var output = new Uint8Array(input1.length); 
+                for (var j = 0;j<input1.length;j++){
+                    output[j] = Math.min(input1[j]+input2[j],255);
+                }
+                return output;
+            }
+                    
+
             function downsample (input, width, height, factor) {
                 var new_width = width / factor;
                 var new_height = height / factor;

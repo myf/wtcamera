@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    <body>
+        <h1 id="FPS">number of frames</h1>
+        <canvas id="input" width="200" height="200"> </canvas>
+        <canvas id="output" width="200" height="200"> </canvas>
+        <script type="text/javascript" src="edge_video.js"></script>
+        <script type="text/javascript">
+
+            var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                               navigator.mozGetUserMedia || navigator.msGetUserMedia;
+            var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+            /*
+            function FPSTracker(){
+                this.renderTimes = [];
+            }
+            FPSTracker.prototype.trackRender = function(){
+                this.renderTimes.push(+new Date);
+                if (this.renderTimes.length > 20) {
+                    this.renderTimes.shift();
+                }
+            };
+            FPSTracker.prototype.getFPS = function(){
+                return this.renderTimes.length / (+new Date() - this.renderTimes[0]) * 1000;
+            }
+            */
+
+           //var canvasEl = document.getElementById('video_input');
+            getUserMedia.call(navigator, 'video', function(stream) {
+                    var videoEl = document.createElement('video');
+                    videoEl.src = URL.createObjectURL(stream);
+                    videoEl.play();
+                    setInterval(function() {
+                        /*
+                        var canvas = document.getElementById('input');
+                        var ctx = canvas.getContext('2d');
+                        ctx.drawImage(videoEl,0,0,200,200);
+                        */
+                        render(videoEl);
+
+                    }, 200);
+
+            })
+                    
+
+        </script>
+    </body>
+
+</html>

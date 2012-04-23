@@ -1,32 +1,36 @@
-< !DOCTYPE html>
+<!DOCTYPE html>
 <html>
     <head>
-<script type="text/javascript" src="edge_video.js"></script>
+        <script type="text/javascript" src="edge_video.js"></script>
         <script type="text/javascript">
- 
-function init() {
-    var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || pnavigator.mozGetUserMedia || navigator.msGetUserMedia;
 
-    var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
-    getUserMedia.call(navigator, 'video', function(stream) {
-	var videoEl = document.createElement('video');
-	videoEl.src = URL.createObjectURL(stream);
-        videoEl.play();
-        setInterval(function () {
-	    render(videoEl);
-	    
-        }, 200);
-	
-    });
-};
+            var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                               navigator.mozGetUserMedia || navigator.msGetUserMedia;
+            var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+            getUserMedia.call(navigator, 'video', function(stream) {
+                    var video_element = document.createElement('video');
+                    video_element.src = URL.createObjectURL(stream);
+                    video_element.play();
+                    setInterval(function() {
+                        /*
+                        var canvas = document.getElementById('input');
+                        var ctx = canvas.getContext('2d');
+                        ctx.drawImage(video_element,0,0,500,500);
+                        */
+                        update_video(video_element,15);
+
+                    }, 200);
+
+            })
+                    
 
         </script>
-    </head>
-    <body onload="init()">
-        <h1 id="FPS">number of frames</h1>
-        <canvas id="input" width="200" height="200"> </canvas>
-        <canvas id="output" width="200" height="200"> </canvas>
 
+    </head>
+    <body>
+        <h1 id="FPS">number of frames</h1>
+            <canvas id="input" width="500" height="500" style="visibility:hidden"> </canvas>
+        <canvas id="output" width="500" height="500"> </canvas>
     </body>
 
 </html>

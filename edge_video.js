@@ -1,5 +1,12 @@
-function update_video(video_element,threshold) {
-    var input = document.getElementById('input');
+function update_video(video_element,dim,threshold) {
+    var input = document.createElement('canvas');
+    input.setAttribute('width', dim);
+    input.setAttribute('height', dim);
+    /*
+     * canvas = document.createElement('canvas');  
+     *       canvas.setAttribute('width',132);  
+     *             canvas.setAttribute('height',150);  
+     */
     var input_context = input.getContext('2d');
     //draw input first
     input_context.drawImage(video_element,0,0, input.width, input.height);
@@ -8,6 +15,7 @@ function update_video(video_element,threshold) {
     var output_context = output.getContext('2d');
 
     var output_data = outline_transform(input_data,input,threshold);
+    output_data = json_parse(output_data,dim);
     var finalImage = output_context.createImageData(input.width,input.height);
     for (var i=0;i<input_data.data.length;i=i+4){
         finalImage.data[i]=output_data[i/4]*255;
@@ -16,6 +24,7 @@ function update_video(video_element,threshold) {
         finalImage.data[i+3]=255;
     }
     output_context.putImageData(finalImage,0,0);
+    
 }
 
 function outline_transform(input_data,input,threshold) {
@@ -50,7 +59,9 @@ function outline_transform(input_data,input,threshold) {
             }
             return x;
     });
+    
 
+    result = jsonfy(result);
     return result;
 }
 
@@ -110,3 +121,21 @@ function downsample (input, width, height, factor) {
     return output;
 }
 
+function jsonfy (result) {
+    arr = [];
+    for (var m=0;m<result.length;m++) {
+        if (result[m] === 1) {
+            arr.push(m);
+        }
+    }
+    return arr;
+}
+
+function json_parse (data, dim) {
+    arr = new Uint8Array(dim*dim);
+    for (var n=0;n<data.length;n++) {
+        var index = data[n];
+        arr[index] = 1;
+    }
+    return arr;
+}

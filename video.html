@@ -10,6 +10,7 @@
             var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                                navigator.mozGetUserMedia || navigator.msGetUserMedia;
             var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+            var dimention = 500;
             getUserMedia.call(navigator, 'video', function(stream) {
                     video_element = document.createElement('video');
                     video_element.src = URL.createObjectURL(stream);
@@ -20,27 +21,23 @@
                         var ctx = canvas.getContext('2d');
                         ctx.drawImage(video_element,0,0,500,500);
                         */
-                        update(15);
+                        var emit_data = update_video(video_element,dimention);
                     }, 200);
 
             })
 
-            function update(interval) {
-                update_video(video_element,interval);
-            }
-                    
             $(function() {
                 $( "#slider" ).slider({
                     value:15,
-                    min: 0,
-                    max: 100,
-                    step: 5,
+                    min: 1,
+                    max: 20,
+                    step: 1,
                     slide: function( event, ui ) {
                         $( "#amount" ).val( ui.value );
                         window.clearInterval(window.refresh);
 
                         window.refresh = setInterval(function() {
-                            update(ui.value);
+                            emit_data = update_video(video_element,dimention,ui.value);
                         });
                     }
                 });
@@ -51,7 +48,9 @@
     </head>
     <body>
         <h1 id="FPS">number of frames</h1>
+            <!--
             <canvas id="input" width="500" height="500" style="visibility:hidden"> </canvas>
+            -->
         <canvas id="output" width="500" height="500"> </canvas>
         <div class="demo">
 

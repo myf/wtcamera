@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script type="text/javascript" src ="edge_video.js"></script>
+
     </head>
     <body>
         <canvas id="input" width="500" height="500"></canvas>  
         <canvas id="output" width="500" height="500"></canvas>  
-        
-        <script type="text/javascript" src='edge.js'></script>
         <script type="text/javascript">
-            var incoming_frame = new Image();
-            incoming_frame.src = 'obama.jpg';
-            render(incoming_frame);
+            var input_image= new Image();
+            input_image.src = "pic/4.jpg";
+            input_image.onload = function () {
+                update_video(input_image);
+                
+            }
+        
         </script>
+        <!--
+        <script type="text/javascript" src='edge.js'></script>
+        -->
 
+        
+       
     </body>
 
 </html>

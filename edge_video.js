@@ -2,16 +2,23 @@ function update_video(video_element) {
     var input = document.getElementById('input');
     var input_context = input.getContext('2d');
     //draw input first
+    input_context.drawImage(video_element,0,0, input.width, input.height);
     var input_data = input_context.getImageData(0,0,input.width,input.height);
     var output = document.getElementById('output');
     var output_context = output.getContext('2d');
 
-    input_context.drawImage(video_element,0,0, input.width, input.height);
-    var output_data = outline_transform(input_data,input,output_context);
-    output_context.putImageData(output_data,0,0);
+    var output_data = outline_transform(input_data,input);
+    var finalImage = output_context.createImageData(input.width,input.height);
+    for (var i=0;i<input_data.data.length;i=i+4){
+        finalImage.data[i]=output_data[i/4]*255;
+        finalImage.data[i+1]=output_data[i/4]*255;
+        finalImage.data[i+2]=output_data[i/4]*255;
+        finalImage.data[i+3]=255;
+    }
+    output_context.putImageData(finalImage,0,0);
 }
 
-function outline_transform(input_data,input,output_context) {
+function outline_transform(input_data,input) {
     var sobel = [[-1,-1,-1],
                 [-1,8,-1],
                 [-1,-1,-1]];
@@ -22,13 +29,12 @@ function outline_transform(input_data,input,output_context) {
                     [7,26,41,26,7],
                     [4,16,26,16,4],
                     [1,4,7,4,1]];
-    var finalImage = output_context.createImageData(input.width,input.height);
     //black and whiting
     var bw = new Uint8Array(input.width*input.height);
     for (var i=0,data_length = input_data.data.length;i<data_length;i=i+4){
         bw[i/4]=Math.floor((input_data.data[i]+input_data.data[i+1]+input_data.data[i+2])/3)
     }
-    //var small = downsample(bw, input.width, input.height, 1);
+    //var small = downsample(bw, input.width, input.height, 2);
     var smoothed = convolve(bw, input.width, input.height,gaussian,1/273);
     var result1 = convolve(smoothed, input.width, input.height,vertical_gradient,1);
     var result2 = convolve(smoothed, input.width, input.height,horizontal_gradient,1);
@@ -39,21 +45,16 @@ function outline_transform(input_data,input,output_context) {
             if (x>15) {
                 x = 0;
             }else{
-                x=255;
+                x=1;
             }
             return x;
     });
 
-    for (var i=0;i<data_length;i=i+4){
-        finalImage.data[i]=result[i/4];
-        finalImage.data[i+1]=result[i/4];
-        finalImage.data[i+2]=result[i/4];
-        finalImage.data[i+3]=255;
-        
-    }
+    return result;
+
+    
 
 
-    return finalImage;
 }
 
 function convolve (input, width, height, kernel,n_factor) {

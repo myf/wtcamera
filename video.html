@@ -2,28 +2,50 @@
 <html>
     <head>
         <script type="text/javascript" src="edge_video.js"></script>
+        <script type="text/javascript" src="js/js/jquery-1.7.2.min.js"></script>
+        <script type="text/javascript" src="js/js/jquery-ui-1.8.19.custom.min.js"></script>
+        <link rel="stylesheet" href="js/css/ui-lightness/jquery-ui-1.8.19.custom.css">
         <script type="text/javascript">
 
             var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                                navigator.mozGetUserMedia || navigator.msGetUserMedia;
             var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
             getUserMedia.call(navigator, 'video', function(stream) {
-                    var video_element = document.createElement('video');
+                    video_element = document.createElement('video');
                     video_element.src = URL.createObjectURL(stream);
                     video_element.play();
-                    setInterval(function() {
+                    window.refresh = window.setInterval(function() {
                         /*
                         var canvas = document.getElementById('input');
                         var ctx = canvas.getContext('2d');
                         ctx.drawImage(video_element,0,0,500,500);
                         */
-                        update_video(video_element,15);
-
+                        update(15);
                     }, 200);
 
             })
-                    
 
+            function update(interval) {
+                update_video(video_element,interval);
+            }
+                    
+            $(function() {
+                $( "#slider" ).slider({
+                    value:15,
+                    min: 0,
+                    max: 100,
+                    step: 5,
+                    slide: function( event, ui ) {
+                        $( "#amount" ).val( ui.value );
+                        window.clearInterval(window.refresh);
+
+                        window.refresh = setInterval(function() {
+                            update(ui.value);
+                        });
+                    }
+                });
+                $( "#amount" ).val( $( "#slider" ).slider( "value" ) );
+            });
         </script>
 
     </head>
@@ -31,6 +53,15 @@
         <h1 id="FPS">number of frames</h1>
             <canvas id="input" width="500" height="500" style="visibility:hidden"> </canvas>
         <canvas id="output" width="500" height="500"> </canvas>
+        <div class="demo">
+
+        <p>
+            <label for="amount">threshhold</label>
+            <input type="text" id="amount" style="border:0; color:#f6931f; font-weight:bold;" />
+        </p>
+
+        <div id="slider"></div>
+        <div style="clear:both">&nbsp;</div>
     </body>
 
 </html>

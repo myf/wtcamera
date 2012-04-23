@@ -1,4 +1,4 @@
-function update_video(video_element) {
+function update_video(video_element,threshold) {
     var input = document.getElementById('input');
     var input_context = input.getContext('2d');
     //draw input first
@@ -7,7 +7,7 @@ function update_video(video_element) {
     var output = document.getElementById('output');
     var output_context = output.getContext('2d');
 
-    var output_data = outline_transform(input_data,input);
+    var output_data = outline_transform(input_data,input,threshold);
     var finalImage = output_context.createImageData(input.width,input.height);
     for (var i=0;i<input_data.data.length;i=i+4){
         finalImage.data[i]=output_data[i/4]*255;
@@ -18,7 +18,7 @@ function update_video(video_element) {
     output_context.putImageData(finalImage,0,0);
 }
 
-function outline_transform(input_data,input) {
+function outline_transform(input_data,input,threshold) {
     var sobel = [[-1,-1,-1],
                 [-1,8,-1],
                 [-1,-1,-1]];
@@ -42,7 +42,8 @@ function outline_transform(input_data,input) {
     apply_to_each_pixel(result, function (x) {
             //reverse it
             //threshold
-            if (x>15) {
+            var t = threshold || 15;
+            if (x>t) {
                 x = 0;
             }else{
                 x=1;
@@ -51,10 +52,6 @@ function outline_transform(input_data,input) {
     });
 
     return result;
-
-    
-
-
 }
 
 function convolve (input, width, height, kernel,n_factor) {

@@ -16,7 +16,7 @@ input_context = input.getContext('2d');
 output_context = output.getContext('2d');
 finalImage = output_context.createImageData(input.width,input.height);
 var img = new Image();
-img.src = 'obama.jpg';
+img.src = "pic/8.jpg";
 img.onload = function () {
     input_context.drawImage(img,0,0)
     var input_data = input_context.getImageData(0,0,input.width,input.height)

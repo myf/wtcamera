@@ -1,6 +1,6 @@
 var express = require('express');
 var app = express.createServer();
-var io = require('socket.io').listen(app);
+var io = require('socket.io').listen(app, { log: false });
 
 app.listen(8888);
 
@@ -26,6 +26,7 @@ io.sockets.on('connection', function(client) {
 
     client.on('sendframe', function(data){
         client.broadcast.emit('updatevid', data);
+        //console.log(JSON.stringify(data).slice(0,100));
     });
 
 });

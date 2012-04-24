@@ -1,5 +1,5 @@
 function incoming_video(incoming_data, dimention) {
-    incoming_data = JSON.parse(incoming_data);
+    //incoming_data = JSON.parse(incoming_data);
     var canvas = document.getElementById('incoming_vid');
     var canvas_context = canvas.getContext('2d');
 

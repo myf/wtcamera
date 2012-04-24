@@ -2,11 +2,6 @@ function update_video(video_element,dim,threshold) {
     var input = document.createElement('canvas');
     input.setAttribute('width', dim);
     input.setAttribute('height', dim);
-    /*
-     * canvas = document.createElement('canvas');  
-     *       canvas.setAttribute('width',132);  
-     *             canvas.setAttribute('height',150);  
-     */
     var input_context = input.getContext('2d');
     //draw input first
     input_context.drawImage(video_element,0,0, input.width, input.height);

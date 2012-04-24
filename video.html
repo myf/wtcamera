@@ -16,11 +16,6 @@
                     video_element.src = URL.createObjectURL(stream);
                     video_element.play();
                     window.refresh = window.setInterval(function() {
-                        /*
-                        var canvas = document.getElementById('input');
-                        var ctx = canvas.getContext('2d');
-                        ctx.drawImage(video_element,0,0,500,500);
-                        */
                         var emit_data = update_video(video_element,dimention);
                     }, 200);
 

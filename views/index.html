@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="/javascripts/edge_video.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="/javascripts/jquery-1.7.2.min.js"></script>
+        <script type="text/javascript" src="/javascripts/jquery-ui-1.8.19.custom.min.js"></script>
+        <link rel="stylesheet" href="/css/ui-lightness/jquery-ui-1.8.19.custom.css">
+        <script type="text/javascript">
+            //socket init and update video upon receiving data
+            var socket = io.connect();
+            var dimention = 500;
+            socket.on('updatevid', function(data){
+                    //console.log(data.length);
+                    incoming_video(data, dimention);
+            });
+            
+            //updating video from own computer
+            var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                               navigator.mozGetUserMedia || navigator.msGetUserMedia;
+            var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+            var dimention = 500;
+            getUserMedia.call(navigator, 'video', function(stream) {
+                    video_element = document.createElement('video');
+                    video_element.src = URL.createObjectURL(stream);
+                    video_element.play();
+                    window.refresh = window.setInterval(function() {
+                        var emit_data = update_video(video_element,dimention);
+                        //var str_edata = Array.prototype.join.call(emit_data, "");
+                        socket.emit('sendframe', emit_data);
+                    }, 10000);
+
+            });
+            
+
+            $(function() {
+                $( "#slider" ).slider({
+                    value:15,
+                    min: 1,
+                    max: 20,
+                    step: 1,
+                    slide: function( event, ui ) {
+                        $( "#amount" ).val( ui.value );
+                        window.clearInterval(window.refresh);
+
+                        window.refresh = setInterval(function() {
+                            emit_data = update_video(video_element,dimention,ui.value);
+                        });
+                    }
+                });
+                $( "#amount" ).val( $( "#slider" ).slider( "value" ) );
+            });
+        </script>
+
+    </head>
+    <body>
+        <h1 id="FPS">number of frames</h1>
+            <!--
+            <canvas id="input" width="500" height="500" style="visibility:hidden"> </canvas>
+            -->
+        <canvas id="output" width="500" height="500"> </canvas>
+        <canvas id="incoming_vid" width="500" height="500"> </canvas>
+        <div class="demo">
+
+        <p>
+            <label for="amount">threshhold</label>
+            <input type="text" id="amount" style="border:0; color:#f6931f; font-weight:bold;" />
+        </p>
+
+        <div id="slider"></div>
+        <div style="clear:both">&nbsp;</div>
+    </body>
+
+</html>

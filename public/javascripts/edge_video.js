@@ -15,7 +15,6 @@ function incoming_video(incoming_data, dimention) {
     */
     var streaming_image = new Image();
     streaming_image.src = incoming_data;
-    console.log(streaming_image.src);
     streaming_image.onload = function () {
         canvas_context.drawImage(streaming_image,0,0);
     }
@@ -30,7 +29,7 @@ function update_video(video_element,dim,threshold) {
      *       canvas.setAttribute('width',132);  
      *             canvas.setAttribute('height',150);  
      */
-    var input_context = input.getCntext('2d');
+    var input_context = input.getContext('2d');
     //draw input first
     input_context.drawImage(video_element,0,0, input.width, input.height);
     var input_data = input_context.getImageData(0,0,input.width,input.height);

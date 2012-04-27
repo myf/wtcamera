@@ -3,6 +3,7 @@ function incoming_video(incoming_data, dimention) {
     var canvas = document.getElementById('incoming_vid');
     var canvas_context = canvas.getContext('2d');
 
+    /*
     var finalImage = canvas_context.createImageData(dimention,dimention);
     for (var i=0;i<finalImage.data.length;i=i+4){
         finalImage.data[i]=incoming_data[i/4]*255;
@@ -11,6 +12,12 @@ function incoming_video(incoming_data, dimention) {
         finalImage.data[i+3]=255;
     }
     canvas_context.putImageData(finalImage,0,0);
+    */
+    var streaming_image = new Image();
+    streaming_image.src = incoming_data;
+    streaming_image.onload = function () {
+        canvas_context.drawImage(streaming_image,0,0);
+    }
 }
 
 function update_video(video_element,dim,threshold) {
@@ -39,7 +46,14 @@ function update_video(video_element,dim,threshold) {
         finalImage.data[i+3]=255;
     }
     output_context.putImageData(finalImage,0,0);
-    return output_data;
+    var base64png = output.toDataURL()
+    return base64png
+    //instead of return this output_data as a bytestring we 
+    //are outputting a base64 png that might just work a little
+    //better,then we will try other gzip libraries to zip our
+    //data on the fly
+    //
+    //return output_data;
 }
 
 function outline_transform(input_data,input,threshold) {

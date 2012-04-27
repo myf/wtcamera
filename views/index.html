@@ -19,7 +19,6 @@
             var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                                navigator.mozGetUserMedia || navigator.msGetUserMedia;
             var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
-            var dimention = 500;
             getUserMedia.call(navigator, 'video', function(stream) {
                     video_element = document.createElement('video');
                     video_element.src = URL.createObjectURL(stream);
@@ -28,7 +27,7 @@
                         var emit_data = update_video(video_element,dimention);
                         //var str_edata = Array.prototype.join.call(emit_data, "");
                         socket.emit('sendframe', emit_data);
-                    }, 10000);
+                    }, 200);
 
             });
             
@@ -45,7 +44,8 @@
 
                         window.refresh = setInterval(function() {
                             emit_data = update_video(video_element,dimention,ui.value);
-                        });
+                            socket.emit('sendframe', emit_data);
+                        },200);
                     }
                 });
                 $( "#amount" ).val( $( "#slider" ).slider( "value" ) );

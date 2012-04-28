@@ -1,23 +1,18 @@
 function incoming_video(incoming_data, dimention) {
     //incoming_data = JSON.parse(incoming_data);
+    console.log(incoming_data);
     var canvas = document.getElementById('incoming_vid');
     var canvas_context = canvas.getContext('2d');
 
-    /*
     var finalImage = canvas_context.createImageData(dimention,dimention);
+    var array = to_array(incoming_data);
     for (var i=0;i<finalImage.data.length;i=i+4){
-        finalImage.data[i]=incoming_data[i/4]*255;
-        finalImage.data[i+1]=incoming_data[i/4]*255;
-        finalImage.data[i+2]=incoming_data[i/4]*255;
+        finalImage.data[i]=array[i/4]*255;
+        finalImage.data[i+1]=array[i/4]*255;
+        finalImage.data[i+2]=array[i/4]*255;
         finalImage.data[i+3]=255;
     }
     canvas_context.putImageData(finalImage,0,0);
-    */
-    var streaming_image = new Image();
-    streaming_image.src = incoming_data;
-    streaming_image.onload = function () {
-        canvas_context.drawImage(streaming_image,0,0);
-    }
 }
 
 function update_video(video_element,dim,threshold) {
@@ -36,8 +31,10 @@ function update_video(video_element,dim,threshold) {
     var output = document.getElementById('output');
     var output_context = output.getContext('2d');
 
-    var output_data = outline_transform(input_data,input,threshold);
-    output_data = json_parse(output_data,dim);
+    var hex = outline_transform(input_data,input,threshold);
+    //output_data = json_parse(output_data,dim);
+    //now we have a hex string
+    output_data = to_array(hex);
     var finalImage = output_context.createImageData(input.width,input.height);
     for (var i=0;i<input_data.data.length;i=i+4){
         finalImage.data[i]=output_data[i/4]*255;
@@ -46,14 +43,14 @@ function update_video(video_element,dim,threshold) {
         finalImage.data[i+3]=255;
     }
     output_context.putImageData(finalImage,0,0);
-    var base64png = output.toDataURL()
-    return base64png
+    //var base64png = output.toDataURL()
+    //return base64png
     //instead of return this output_data as a bytestring we 
     //are outputting a base64 png that might just work a little
     //better,then we will try other gzip libraries to zip our
     //data on the fly
     //
-    //return output_data;
+    return hex;
 }
 
 function outline_transform(input_data,input,threshold) {
@@ -90,7 +87,7 @@ function outline_transform(input_data,input,threshold) {
     });
     
 
-    result = jsonfy(result);
+    result = to_hex(result);
     return result;
 }
 
@@ -150,6 +147,7 @@ function downsample (input, width, height, factor) {
     return output;
 }
 
+/*
 function jsonfy (result) {
     arr = [];
     for (var m=0;m<result.length;m++) {
@@ -168,3 +166,34 @@ function json_parse (data, dim) {
     }
     return arr;
 }
+*/
+
+function to_hex(bin_array) {
+    var result=[];
+    var arr_length = bin_array.length;
+    for (var i=0;i<arr_length-arr_length%4;i+=4){
+        var sum = (bin_array[i]<<3)+
+            (bin_array[i+1]<<2)+
+            (bin_array[i+2]<<1)+
+            (bin_array[i+3]);
+        var hex = sum.toString(16);
+        result.push(hex);
+    }
+
+    return result.join("");
+}
+
+     
+function to_array(hex) {
+    var array = new Uint8Array(hex.length*4);
+    for (var i=0;i<hex.length;i++) {
+        var bit_string = parseInt(hex[i],16).toString(2);
+        array[4*i+0]=bit_string[0];
+        array[4*i+1]=bit_string[1];
+        array[4*i+2]=bit_string[2];
+        array[4*i+3]=bit_string[3];
+    }
+    return array;
+}
+
+

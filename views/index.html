@@ -9,7 +9,7 @@
         <script type="text/javascript">
             //socket init and update video upon receiving data
             var socket = io.connect();
-            var dimention = 500;
+            var dimention = 256;
             socket.on('updatevid', function(data){
                     //console.log(data.length);
                     incoming_video(data, dimention);
@@ -27,7 +27,7 @@
                         var emit_data = update_video(video_element,dimention);
                         //var str_edata = Array.prototype.join.call(emit_data, "");
                         socket.emit('sendframe', emit_data);
-                    }, 200);
+                    }, 10000);
 
             });
             
@@ -56,10 +56,10 @@
     <body>
         <h1 id="FPS">number of frames</h1>
             <!--
-            <canvas id="input" width="500" height="500" style="visibility:hidden"> </canvas>
+            <canvas id="input" width="256" height="256" style="visibility:hidden"> </canvas>
             -->
-        <canvas id="output" width="500" height="500"> </canvas>
-        <canvas id="incoming_vid" width="500" height="500"> </canvas>
+        <canvas id="output" width="256" height="256"> </canvas>
+        <canvas id="incoming_vid" width="256" height="256"> </canvas>
         <div class="demo">
 
         <p>

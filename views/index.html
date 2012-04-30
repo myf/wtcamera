@@ -35,6 +35,7 @@
 
                         // update the local canvas
                         update_video(emit_data, 'output');
+                        //update_video(detect_edges(video_element,dimention), 'output');
 
                         //var str_edata = Array.prototype.join.call(emit_data, "");
                     }, 200);
@@ -53,8 +54,9 @@
                         window.clearInterval(window.refresh);
 
                         window.refresh = setInterval(function() {
-                            emit_data = update_video(video_element,dimention,ui.value);
+                            var emit_data = detect_edges(video_element,dimention,ui.value);
                             socket.emit('sendframe', emit_data);
+                            update_video(emit_data,'output');
                         },200);
                     }
                 });

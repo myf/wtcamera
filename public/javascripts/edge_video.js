@@ -1,5 +1,6 @@
 function incoming_video(incoming_data, dimention) {
     //incoming_data = JSON.parse(incoming_data);
+    //incoming_data = lzw_decode(incoming_data);
     var canvas = document.getElementById('incoming_vid');
     var canvas_context = canvas.getContext('2d');
 
@@ -37,7 +38,6 @@ function update_video(video_element,dim,threshold) {
     var output_context = output.getContext('2d');
 
     var output_data = outline_transform(input_data,input,threshold);
-    output_data = json_parse(output_data,dim);
     var finalImage = output_context.createImageData(input.width,input.height);
     for (var i=0;i<input_data.data.length;i=i+4){
         finalImage.data[i]=output_data[i/4]*255;
@@ -47,7 +47,8 @@ function update_video(video_element,dim,threshold) {
     }
     output_context.putImageData(finalImage,0,0);
     var base64png = output.toDataURL()
-    return base64png
+    //return lzw_encode(base64png);
+    return base64png;
     //instead of return this output_data as a bytestring we 
     //are outputting a base64 png that might just work a little
     //better,then we will try other gzip libraries to zip our
@@ -90,7 +91,6 @@ function outline_transform(input_data,input,threshold) {
     });
     
 
-    result = jsonfy(result);
     return result;
 }
 
@@ -168,3 +168,57 @@ function json_parse (data, dim) {
     }
     return arr;
 }
+
+// LZW-compress a string
+function lzw_encode(s) {
+    var dict = {};
+    var data = (s + "").split("");
+    var out = [];
+    var currChar;
+    var phrase = data[0];
+    var code = 256;
+    for (var i=1; i<data.length; i++) {
+        currChar=data[i];
+        if (dict[phrase + currChar] != null) {
+            phrase += currChar;
+        }
+        else {
+            out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+            dict[phrase + currChar] = code;
+            code++;
+            phrase=currChar;
+        }
+    }
+    out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+    for (var i=0; i<out.length; i++) {
+        out[i] = String.fromCharCode(out[i]);
+    }
+    return out.join("");
+}
+
+// Decompress an LZW-encoded string
+function lzw_decode(s) {
+    var dict = {};
+    var data = (s + "").split("");
+    var currChar = data[0];
+    var oldPhrase = currChar;
+    var out = [currChar];
+    var code = 256;
+    var phrase;
+    for (var i=1; i<data.length; i++) {
+        var currCode = data[i].charCodeAt(0);
+        if (currCode < 256) {
+            phrase = data[i];
+        }
+        else {
+           phrase = dict[currCode] ? dict[currCode] : (oldPhrase + currChar);
+        }
+        out.push(phrase);
+        currChar = phrase.charAt(0);
+        dict[code] = oldPhrase + currChar;
+        code++;
+        oldPhrase = phrase;
+    }
+    return out.join("");
+}
+

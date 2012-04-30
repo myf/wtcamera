@@ -27,6 +27,7 @@ function incoming_video(incoming_data, dimention) {
 
 function update_video(data, canvas_id) {
     // output will display the processed webcam image from own computer
+    data = unicode_to_bin(data);
     var output = document.getElementById(canvas_id);
     var output_context = output.getContext('2d');
 
@@ -93,7 +94,7 @@ function detect_edges(video_element,dim,threshold) {
             return x;
     });
     
-
+    result = bin_to_unicode(result);
     return result;
 }
 
@@ -153,21 +154,11 @@ function downsample (input, width, height, factor) {
     return output;
 }
 
-function jsonfy (result) {
-    arr = [];
-    for (var m=0;m<result.length;m++) {
-        if (result[m] === 1) {
-            arr.push(m);
-        }
-    }
-    return arr;
+function bin_to_unicode(uint8array) {
+    return uint8array;
+
 }
 
-function json_parse (data, dim) {
-    arr = new Uint8Array(dim*dim);
-    for (var n=0;n<data.length;n++) {
-        var index = data[n];
-        arr[index] = 1;
-    }
-    return arr;
+function unicode_to_bin(unicode) {
+    return unicode;
 }

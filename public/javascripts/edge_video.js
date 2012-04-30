@@ -1,65 +1,58 @@
+// handles video data from other user
 function incoming_video(incoming_data, dimention) {
     //incoming_data = JSON.parse(incoming_data);
     var canvas = document.getElementById('incoming_vid');
     var canvas_context = canvas.getContext('2d');
 
-    /*
+    //in itialize and empty array
     var finalImage = canvas_context.createImageData(dimention,dimention);
+
+    // loop renders the data into the empty array
     for (var i=0;i<finalImage.data.length;i=i+4){
+        // converts the 1/0 value into an RGBA value
         finalImage.data[i]=incoming_data[i/4]*255;
         finalImage.data[i+1]=incoming_data[i/4]*255;
         finalImage.data[i+2]=incoming_data[i/4]*255;
         finalImage.data[i+3]=255;
     }
+    // Display the data on the canvas.
     canvas_context.putImageData(finalImage,0,0);
-    */
-    var streaming_image = new Image();
-    streaming_image.src = incoming_data;
-    streaming_image.onload = function () {
-        canvas_context.drawImage(streaming_image,0,0);
-    }
+ 
+//    var streaming_image = new Image();
+//    streaming_image.src = incoming_data;
+//    streaming_image.onload = function () {
+//        canvas_context.drawImage(streaming_image,0,0);
+//    }
 }
 
-function update_video(video_element,dim,threshold) {
-    var input = document.createElement('canvas');
-    input.setAttribute('width', dim);
-    input.setAttribute('height', dim);
-    /*
-     * canvas = document.createElement('canvas');  
-     *       canvas.setAttribute('width',132);  
-     *             canvas.setAttribute('height',150);  
-     */
-    var input_context = input.getContext('2d');
-    //draw input first
-    input_context.drawImage(video_element,0,0, input.width, input.height);
-    var input_data = input_context.getImageData(0,0,input.width,input.height);
-    var output = document.getElementById('output');
+function update_video(data, canvas_id) {
+    // output will display the processed webcam image from own computer
+    var output = document.getElementById(canvas_id);
     var output_context = output.getContext('2d');
 
-    var output_data = outline_transform(input_data,input,threshold);
-    output_data = json_parse(output_data,dim);
-    var finalImage = output_context.createImageData(input.width,input.height);
-    for (var i=0;i<input_data.data.length;i=i+4){
-        finalImage.data[i]=output_data[i/4]*255;
-        finalImage.data[i+1]=output_data[i/4]*255;
-        finalImage.data[i+2]=output_data[i/4]*255;
+    // draw the data to the canvas
+    var finalImage = output_context.createImageData(output.width,output.height);
+    for (var i=0;i<data.length*4;i=i+4){
+        finalImage.data[i]=data[i/4]*255;
+        finalImage.data[i+1]=data[i/4]*255;
+        finalImage.data[i+2]=data[i/4]*255;
         finalImage.data[i+3]=255;
     }
     output_context.putImageData(finalImage,0,0);
-    var base64png = output.toDataURL()
-    return base64png
-    //instead of return this output_data as a bytestring we 
+//    var base64png = output.toDataURL()
+
+    // transform the data array to a unicode string
+
+//    return base64png;
+    //instead of return this data as a bytestring we 
     //are outputting a base64 png that might just work a little
     //better,then we will try other gzip libraries to zip our
     //data on the fly
     //
-    //return output_data;
+    //return data;
 }
 
-function outline_transform(input_data,input,threshold) {
-    var sobel = [[-1,-1,-1],
-                [-1,8,-1],
-                [-1,-1,-1]];
+function detect_edges(video_element,dim,threshold) {
     var horizontal_gradient =[[-1,0,1]];
     var vertical_gradient =[[-1],[0],[1]];
     var gaussian = [[1,4,7,4,1],
@@ -67,6 +60,17 @@ function outline_transform(input_data,input,threshold) {
                     [7,26,41,26,7],
                     [4,16,26,16,4],
                     [1,4,7,4,1]];
+
+    // input is a hidden / undisplayed canvas ... it has the data
+    // that comes from the webcam, unprocessed
+    var input = document.createElement('canvas');
+    input.setAttribute('width', dim);
+    input.setAttribute('height', dim);
+    var input_context = input.getContext('2d');
+    //draw input first
+    input_context.drawImage(video_element,0,0, input.width, input.height);
+    var input_data = input_context.getImageData(0,0,input.width,input.height);
+
     //black and whiting
     var bw = new Uint8Array(input.width*input.height);
     for (var i=0,data_length = input_data.data.length;i<data_length;i=i+4){
@@ -90,7 +94,6 @@ function outline_transform(input_data,input,threshold) {
     });
     
 
-    result = jsonfy(result);
     return result;
 }
 

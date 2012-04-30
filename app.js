@@ -1,6 +1,6 @@
 var express = require('express');
 var app = express.createServer();
-var io = require('socket.io').listen(app, { log: false });
+var io = require('socket.io').listen(app, { log: true });
 
 app.listen(8888);
 

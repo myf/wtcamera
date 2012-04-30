@@ -10,8 +10,10 @@
             //socket init and update video upon receiving data
             var socket = io.connect();
             var dimention = 500;
+            // event generated when video data comes from other user
             socket.on('updatevid', function(data){
                     //console.log(data.length);
+                    // send the data to the incoming_video function to be processed and displayed
                     incoming_video(data, dimention);
             });
             
@@ -19,14 +21,22 @@
             var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                                navigator.mozGetUserMedia || navigator.msGetUserMedia;
             var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+            // collects data from webcam passes the stream data to the 
             getUserMedia.call(navigator, 'video', function(stream) {
                     video_element = document.createElement('video');
                     video_element.src = URL.createObjectURL(stream);
                     video_element.play();
+
+                    // attach the setInterval function to the window object
                     window.refresh = window.setInterval(function() {
-                        var emit_data = update_video(video_element,dimention);
-                        //var str_edata = Array.prototype.join.call(emit_data, "");
+                        // send the video data to other person
+                        var emit_data = detect_edges(video_element,dimention)
                         socket.emit('sendframe', emit_data);
+
+                        // update the local canvas
+                        update_video(emit_data, 'output');
+
+                        //var str_edata = Array.prototype.join.call(emit_data, "");
                     }, 200);
 
             });

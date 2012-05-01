@@ -1,65 +1,33 @@
-function incoming_video(incoming_data, dimention) {
-    //incoming_data = JSON.parse(incoming_data);
-    var canvas = document.getElementById('incoming_vid');
-    var canvas_context = canvas.getContext('2d');
-
-    /*
-    var finalImage = canvas_context.createImageData(dimention,dimention);
-    for (var i=0;i<finalImage.data.length;i=i+4){
-        finalImage.data[i]=incoming_data[i/4]*255;
-        finalImage.data[i+1]=incoming_data[i/4]*255;
-        finalImage.data[i+2]=incoming_data[i/4]*255;
-        finalImage.data[i+3]=255;
-    }
-    canvas_context.putImageData(finalImage,0,0);
-    */
-    var streaming_image = new Image();
-    streaming_image.src = incoming_data;
-    streaming_image.onload = function () {
-        canvas_context.drawImage(streaming_image,0,0);
-    }
-}
-
-function update_video(video_element,dim,threshold) {
-    var input = document.createElement('canvas');
-    input.setAttribute('width', dim);
-    input.setAttribute('height', dim);
-    /*
-     * canvas = document.createElement('canvas');  
-     *       canvas.setAttribute('width',132);  
-     *             canvas.setAttribute('height',150);  
-     */
-    var input_context = input.getContext('2d');
-    //draw input first
-    input_context.drawImage(video_element,0,0, input.width, input.height);
-    var input_data = input_context.getImageData(0,0,input.width,input.height);
-    var output = document.getElementById('output');
+function update_video(data, canvas_id) {
+    // output will display the processed webcam image from own computer
+    data = lzw_decode(data);
+    var output = document.getElementById(canvas_id);
     var output_context = output.getContext('2d');
+    data = base64_to_bin(data,output.height);
 
-    var output_data = outline_transform(input_data,input,threshold);
-    output_data = json_parse(output_data,dim);
-    var finalImage = output_context.createImageData(input.width,input.height);
-    for (var i=0;i<input_data.data.length;i=i+4){
-        finalImage.data[i]=output_data[i/4]*255;
-        finalImage.data[i+1]=output_data[i/4]*255;
-        finalImage.data[i+2]=output_data[i/4]*255;
+    // draw the data to the canvas
+    var finalImage = output_context.createImageData(output.width,output.height);
+    for (var i=0;i<data.length*4;i=i+4){
+        finalImage.data[i]=data[i/4]*255;
+        finalImage.data[i+1]=data[i/4]*255;
+        finalImage.data[i+2]=data[i/4]*255;
         finalImage.data[i+3]=255;
     }
     output_context.putImageData(finalImage,0,0);
-    var base64png = output.toDataURL()
-    return base64png
-    //instead of return this output_data as a bytestring we 
+//    var base64png = output.toDataURL()
+
+    // transform the data array to a unicode string
+
+//    return base64png;
+    //instead of return this data as a bytestring we 
     //are outputting a base64 png that might just work a little
     //better,then we will try other gzip libraries to zip our
     //data on the fly
     //
-    //return output_data;
+    //return data;
 }
 
-function outline_transform(input_data,input,threshold) {
-    var sobel = [[-1,-1,-1],
-                [-1,8,-1],
-                [-1,-1,-1]];
+function detect_edges(video_element,dim,threshold) {
     var horizontal_gradient =[[-1,0,1]];
     var vertical_gradient =[[-1],[0],[1]];
     var gaussian = [[1,4,7,4,1],
@@ -67,6 +35,17 @@ function outline_transform(input_data,input,threshold) {
                     [7,26,41,26,7],
                     [4,16,26,16,4],
                     [1,4,7,4,1]];
+
+    // input is a hidden / undisplayed canvas ... it has the data
+    // that comes from the webcam, unprocessed
+    var input = document.createElement('canvas');
+    input.setAttribute('width', dim);
+    input.setAttribute('height', dim);
+    var input_context = input.getContext('2d');
+    //draw input first
+    input_context.drawImage(video_element,0,0, input.width, input.height);
+    var input_data = input_context.getImageData(0,0,input.width,input.height);
+
     //black and whiting
     var bw = new Uint8Array(input.width*input.height);
     for (var i=0,data_length = input_data.data.length;i<data_length;i=i+4){
@@ -89,8 +68,8 @@ function outline_transform(input_data,input,threshold) {
             return x;
     });
     
-
-    result = jsonfy(result);
+    result = bin_to_base64(result);
+    result = lzw_encode(result);
     return result;
 }
 
@@ -150,21 +129,107 @@ function downsample (input, width, height, factor) {
     return output;
 }
 
-function jsonfy (result) {
-    arr = [];
-    for (var m=0;m<result.length;m++) {
-        if (result[m] === 1) {
-            arr.push(m);
-        }
-    }
-    return arr;
+function bin_to_unicode(uint8array) {
+    return uint8array;
+
 }
 
-function json_parse (data, dim) {
-    arr = new Uint8Array(dim*dim);
-    for (var n=0;n<data.length;n++) {
-        var index = data[n];
-        arr[index] = 1;
-    }
-    return arr;
+function unicode_to_bin(unicode) {
+    return unicode;
 }
+
+
+function bin_to_base64(uint8array) {
+	_key_map= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    var result = "";
+    var iter_length = uint8array.length-uint8array.length%6;
+    var header = "data:text/plain;charset=utf-8,";
+    //get the value
+    for (var i=0;i<iter_length;i+=6) {
+        var sum = 0;
+        for (var j=0;j<6;j++) {
+            sum += (uint8array[i+j]<<(5-j));
+        }
+        result = result.concat(_key_map[sum]);
+    }
+    result = header.concat(result);
+    return result;
+}
+
+String.prototype.times = function(n) { return (new Array(n+1)).join(this);};
+
+function base64_to_bin(base64,dim) {
+	_key_map= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    var header = "data:text/plain;charset=utf-8,";
+    base64 = base64.substr(header.length,base64.length);
+    var piece_string;
+    var result = new Uint8Array(dim*dim);
+    for (var i=0;i<base64.length;i++) {
+        piece_string = parseInt(_key_map.indexOf(base64[i]),10).toString(2);
+        if (piece_string.length < 6) {
+            piece_string = ("0".times(6-piece_string.length)).concat(piece_string);
+        }
+        //console.log(piece_string);
+        for (var j=0; j<piece_string.length;j++) {
+            result[6*i+j] = piece_string[j];
+        }
+    }
+    return result;
+}
+
+
+
+
+// LZW-compress a string
+function lzw_encode(s) {
+    var dict = {};
+    var data = (s + "").split("");
+    var out = [];
+    var currChar;
+    var phrase = data[0];
+    var code = 256;
+    for (var i=1; i<data.length; i++) {
+        currChar=data[i];
+        if (dict[phrase + currChar] != null) {
+            phrase += currChar;
+        }
+        else {
+            out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+            dict[phrase + currChar] = code;
+            code++;
+            phrase=currChar;
+        }
+    }
+    out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+    for (var i=0; i<out.length; i++) {
+        out[i] = String.fromCharCode(out[i]);
+    }
+    return out.join("");
+}
+
+// Decompress an LZW-encoded string
+function lzw_decode(s) {
+    var dict = {};
+    var data = (s + "").split("");
+    var currChar = data[0];
+    var oldPhrase = currChar;
+    var out = [currChar];
+    var code = 256;
+    var phrase;
+    for (var i=1; i<data.length; i++) {
+        var currCode = data[i].charCodeAt(0);
+        if (currCode < 256) {
+            phrase = data[i];
+        }
+        else {
+           phrase = dict[currCode] ? dict[currCode] : (oldPhrase + currChar);
+        }
+        out.push(phrase);
+        currChar = phrase.charAt(0);
+        dict[code] = oldPhrase + currChar;
+        code++;
+        oldPhrase = phrase;
+    }
+    return out.join("");
+}
+

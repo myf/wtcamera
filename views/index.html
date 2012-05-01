@@ -33,13 +33,12 @@
                         // send the video data to other person
                         var emit_data = detect_edges(video_element,dimention)
                         socket.emit('sendframe', emit_data);
-
                         // update the local canvas
                         update_video(emit_data, 'output');
                         //update_video(detect_edges(video_element,dimention), 'output');
 
                         //var str_edata = Array.prototype.join.call(emit_data, "");
-                    }, 2000);
+                    }, 200);
 
             });
             

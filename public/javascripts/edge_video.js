@@ -1,35 +1,9 @@
-// handles video data from other user
-function incoming_video(incoming_data, dimention) {
-    //incoming_data = JSON.parse(incoming_data);
-    var canvas = document.getElementById('incoming_vid');
-    var canvas_context = canvas.getContext('2d');
-
-    //in itialize and empty array
-    var finalImage = canvas_context.createImageData(dimention,dimention);
-
-    // loop renders the data into the empty array
-    for (var i=0;i<finalImage.data.length;i=i+4){
-        // converts the 1/0 value into an RGBA value
-        finalImage.data[i]=incoming_data[i/4]*255;
-        finalImage.data[i+1]=incoming_data[i/4]*255;
-        finalImage.data[i+2]=incoming_data[i/4]*255;
-        finalImage.data[i+3]=255;
-    }
-    // Display the data on the canvas.
-    canvas_context.putImageData(finalImage,0,0);
- 
-//    var streaming_image = new Image();
-//    streaming_image.src = incoming_data;
-//    streaming_image.onload = function () {
-//        canvas_context.drawImage(streaming_image,0,0);
-//    }
-}
-
 function update_video(data, canvas_id) {
     // output will display the processed webcam image from own computer
     data = lzw_decode(data);
     var output = document.getElementById(canvas_id);
     var output_context = output.getContext('2d');
+    data = base64_to_bin(data,output.height);
 
     // draw the data to the canvas
     var finalImage = output_context.createImageData(output.width,output.height);
@@ -94,6 +68,7 @@ function detect_edges(video_element,dim,threshold) {
             return x;
     });
     
+    result = bin_to_base64(result);
     result = lzw_encode(result);
     return result;
 }
@@ -162,6 +137,44 @@ function bin_to_unicode(uint8array) {
 function unicode_to_bin(unicode) {
     return unicode;
 }
+
+
+function bin_to_base64(uint8array) {
+	_key_map= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    var result = "";
+    var iter_length = uint8array.length-uint8array.length%6;
+    //get the value
+    for (var i=0;i<iter_length;i+=6) {
+        var sum = 0;
+        for (var j=0;j<6;j++) {
+            sum += (uint8array[i+j]<<(5-j));
+        }
+        result = result.concat(_key_map[sum]);
+    }
+    return result;
+}
+
+String.prototype.times = function(n) { return (new Array(n+1)).join(this);};
+
+function base64_to_bin(base64,dim) {
+	_key_map= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    var piece_string;
+    var result = new Uint8Array(dim*dim);
+    for (var i=0;i<base64.length;i++) {
+        piece_string = parseInt(_key_map.indexOf(base64[i]),10).toString(2);
+        if (piece_string.length < 6) {
+            piece_string = ("0".times(6-piece_string.length)).concat(piece_string);
+        }
+        //console.log(piece_string);
+        for (var j=0; j<piece_string.length;j++) {
+            result[6*i+j] = piece_string[j];
+        }
+    }
+    return result;
+}
+
+
+
 
 // LZW-compress a string
 function lzw_encode(s) {

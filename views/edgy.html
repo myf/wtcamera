@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="edge_hs.js"></script>
+        <script type="text/javascript">
+            var root = "hs/";
+            for (var i=0;i<14;i++) {
+                var pic_id = parseInt(i).toString()
+                var img = new Image();
+                img.src= root.concat(pic_id.concat(".jpg"));
+                var em = detect_edges(pic_id,img,500);
+                update_pic(em,
+
+
+        </script>
+
+    </head>
+    <body>
+        <canvas id="1_input" width="500" height="500"> </canvas>
+        <canvas id="2_input" width="500" height="500"> </canvas>
+        <canvas id="3_input" width="500" height="500"> </canvas>
+        <canvas id="4_input" width="500" height="500"> </canvas>
+        <canvas id="5_input" width="500" height="500"> </canvas>
+        <canvas id="6_input" width="500" height="500"> </canvas>
+        <canvas id="7_input" width="500" height="500"> </canvas>
+        <canvas id="8_input" width="500" height="500"> </canvas>
+        <canvas id="9_input" width="500" height="500"> </canvas>
+        <canvas id="10_input" width="500" height="500"> </canvas>
+        <canvas id="11_input" width="500" height="500"> </canvas>
+        <canvas id="12_input" width="500" height="500"> </canvas>
+        <canvas id="13_input" width="500" height="500"> </canvas>
+        <canvas id="14_input" width="500" height="500"> </canvas>
+        <canvas id="1_output" width="500" height="500"> </canvas>
+        <canvas id="2_output" width="500" height="500"> </canvas>
+        <canvas id="3_output" width="500" height="500"> </canvas>
+        <canvas id="4_output" width="500" height="500"> </canvas>
+        <canvas id="5_output" width="500" height="500"> </canvas>
+        <canvas id="6_output" width="500" height="500"> </canvas>
+        <canvas id="7_output" width="500" height="500"> </canvas>
+        <canvas id="8_output" width="500" height="500"> </canvas>
+        <canvas id="9_output" width="500" height="500"> </canvas>
+        <canvas id="10_output" width="500" height="500"> </canvas>
+        <canvas id="11_output" width="500" height="500"> </canvas>
+        <canvas id="12_output" width="500" height="500"> </canvas>
+        <canvas id="13_output" width="500" height="500"> </canvas>
+        <canvas id="14_output" width="500" height="500"> </canvas>
+
+    </body>
+</html>

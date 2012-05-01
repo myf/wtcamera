@@ -151,6 +151,7 @@ function bin_to_base64(uint8array) {
         }
         result = result.concat(_key_map[sum]);
     }
+    result = "data:text/plain;charset=utf-8,".concat(result);
     return result;
 }
 
@@ -158,6 +159,7 @@ String.prototype.times = function(n) { return (new Array(n+1)).join(this);};
 
 function base64_to_bin(base64,dim) {
 	_key_map= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    base64 = 
     var piece_string;
     var result = new Uint8Array(dim*dim);
     for (var i=0;i<base64.length;i++) {
@@ -170,6 +172,7 @@ function base64_to_bin(base64,dim) {
             result[6*i+j] = piece_string[j];
         }
     }
+    /add data header
     return result;
 }
 

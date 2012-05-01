@@ -14,6 +14,7 @@ First of all install node.js
 
 Get the repo from github
 > git checkout git://github.com/myf/wtcamera.git
+
 > cd wtcamera
 
 Install Dependency:

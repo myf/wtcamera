@@ -27,7 +27,7 @@ function incoming_video(incoming_data, dimention) {
 
 function update_video(data, canvas_id) {
     // output will display the processed webcam image from own computer
-    data = unicode_to_bin(data);
+    data = lzw_decode(data);
     var output = document.getElementById(canvas_id);
     var output_context = output.getContext('2d');
 
@@ -94,7 +94,7 @@ function detect_edges(video_element,dim,threshold) {
             return x;
     });
     
-    result = bin_to_unicode(result);
+    result = lzw_encode(result);
     return result;
 }
 
@@ -162,3 +162,57 @@ function bin_to_unicode(uint8array) {
 function unicode_to_bin(unicode) {
     return unicode;
 }
+
+// LZW-compress a string
+function lzw_encode(s) {
+    var dict = {};
+    var data = (s + "").split("");
+    var out = [];
+    var currChar;
+    var phrase = data[0];
+    var code = 256;
+    for (var i=1; i<data.length; i++) {
+        currChar=data[i];
+        if (dict[phrase + currChar] != null) {
+            phrase += currChar;
+        }
+        else {
+            out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+            dict[phrase + currChar] = code;
+            code++;
+            phrase=currChar;
+        }
+    }
+    out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+    for (var i=0; i<out.length; i++) {
+        out[i] = String.fromCharCode(out[i]);
+    }
+    return out.join("");
+}
+
+// Decompress an LZW-encoded string
+function lzw_decode(s) {
+    var dict = {};
+    var data = (s + "").split("");
+    var currChar = data[0];
+    var oldPhrase = currChar;
+    var out = [currChar];
+    var code = 256;
+    var phrase;
+    for (var i=1; i<data.length; i++) {
+        var currCode = data[i].charCodeAt(0);
+        if (currCode < 256) {
+            phrase = data[i];
+        }
+        else {
+           phrase = dict[currCode] ? dict[currCode] : (oldPhrase + currChar);
+        }
+        out.push(phrase);
+        currChar = phrase.charAt(0);
+        dict[code] = oldPhrase + currChar;
+        code++;
+        oldPhrase = phrase;
+    }
+    return out.join("");
+}
+

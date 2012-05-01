@@ -9,12 +9,13 @@
         <script type="text/javascript">
             //socket init and update video upon receiving data
             var socket = io.connect();
-            var dimention = 500;
+            var dimention = 256;
             // event generated when video data comes from other user
             socket.on('updatevid', function(data){
                     //console.log(data.length);
                     // send the data to the incoming_video function to be processed and displayed
-                    incoming_video(data, dimention);
+                    //incoming_video(data, dimention);
+                    update_video(data, 'incoming_vid');
             });
             
             //updating video from own computer
@@ -38,7 +39,7 @@
                         //update_video(detect_edges(video_element,dimention), 'output');
 
                         //var str_edata = Array.prototype.join.call(emit_data, "");
-                    }, 200);
+                    }, 2000);
 
             });
             
@@ -68,10 +69,10 @@
     <body>
         <h1 id="FPS">number of frames</h1>
             <!--
-            <canvas id="input" width="500" height="500" style="visibility:hidden"> </canvas>
+            <canvas id="input" width="256" height="256" style="visibility:hidden"> </canvas>
             -->
-        <canvas id="output" width="500" height="500"> </canvas>
-        <canvas id="incoming_vid" width="500" height="500"> </canvas>
+        <canvas id="output" width="256" height="256"> </canvas>
+        <canvas id="incoming_vid" width="256" height="256"> </canvas>
         <div class="demo">
 
         <p>

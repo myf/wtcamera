@@ -1,6 +1,6 @@
-function incoming_video(incoming_data, dimention) {
+function incoming_video(lzw, dimention) {
     //incoming_data = JSON.parse(incoming_data);
-    //incoming_data = lzw_decode(incoming_data);
+    var incoming_data = lzw_decode(lzw);
     var canvas = document.getElementById('incoming_vid');
     var canvas_context = canvas.getContext('2d');
 
@@ -47,8 +47,9 @@ function update_video(video_element,dim,threshold) {
     }
     output_context.putImageData(finalImage,0,0);
     var base64png = output.toDataURL()
-    //return lzw_encode(base64png);
-    return base64png;
+    var lzw = lzw_encode(base64png);
+    return lzw;
+    //return base64png;
     //instead of return this output_data as a bytestring we 
     //are outputting a base64 png that might just work a little
     //better,then we will try other gzip libraries to zip our

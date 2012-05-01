@@ -9,7 +9,7 @@
         <script type="text/javascript">
             //socket init and update video upon receiving data
             var socket = io.connect();
-            var dimention = 512;
+            var dimention = 256;
             socket.on('updatevid', function(data){
                     //console.log(data.length);
                     incoming_video(data, dimention);
@@ -58,8 +58,8 @@
             <!--
             <canvas id="input" width="500" height="500" style="visibility:hidden"> </canvas>
             -->
-        <canvas id="output" width="512" height="512"> </canvas>
-        <canvas id="incoming_vid" width="512" height="512"> </canvas>
+        <canvas id="output" width="256" height="256"> </canvas>
+        <canvas id="incoming_vid" width="256" height="256"> </canvas>
         <div class="demo">
 
         <p>

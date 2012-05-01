@@ -5,7 +5,10 @@
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="/javascripts/jquery-1.7.2.min.js"></script>
         <script type="text/javascript" src="/javascripts/jquery-ui-1.8.19.custom.min.js"></script>
+        <script type="text/javascript" src="/javascripts/bootstrap.min.js"></script>
+
         <link rel="stylesheet" href="/css/ui-lightness/jquery-ui-1.8.19.custom.css">
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
         <script type="text/javascript">
             //socket init and update video upon receiving data
             var socket = io.connect();
@@ -66,21 +69,52 @@
 
     </head>
     <body>
-        <h1 id="FPS">number of frames</h1>
-            <!--
-            <canvas id="input" width="256" height="256" style="visibility:hidden"> </canvas>
-            -->
-        <canvas id="output" width="256" height="256"> </canvas>
-        <canvas id="incoming_vid" width="256" height="256"> </canvas>
-        <div class="demo">
+        
 
-        <p>
-            <label for="amount">threshhold</label>
-            <input type="text" id="amount" style="border:0; color:#f6931f; font-weight:bold;" />
-        </p>
+        <div class="navbar navbar-fixed-top">
+          <div class="navbar-inner">
+            <div class="container">
+              <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </a>
+              <a class="brand" href="#">Video Camera</a>
+              <div class="nav-collapse">
+                <ul class="nav">
+                  <li class="active"><a href="#">Home</a></li>
+                  <li><a href="#about">About</a></li>
+                  <li><a href="#contact">Contact</a></li>
+                </ul>
+              </div><!--/.nav-collapse -->
+            </div>
+          </div>
+        </div>
 
-        <div id="slider"></div>
-        <div style="clear:both">&nbsp;</div>
+        <div class="container">
+            
+            <div style="clear:both">&nbsp;</div>
+            <div style="clear:both">&nbsp;</div>
+            <div style="clear:both">&nbsp;</div>
+
+                <!--
+                <canvas id="input" width="256" height="256" style="visibility:hidden"> </canvas>
+                -->
+            <div class="row">
+            <div class="span6"><canvas class="pull-left" id="output" width="256" height="256"> </canvas></div>
+            <div class="span6"><canvas class="pull-right" id="incoming_vid" width="256" height="256"> </canvas></div>
+            </div>
+            <!-- Slider -->
+            <div class="demo">
+
+            <p>
+                <label for="amount">threshhold</label>
+                <input type="text" id="amount" style="border:0; color:#f6931f; font-weight:bold;" />
+            </p>
+
+            <div id="slider"></div>
+            <div style="clear:both">&nbsp;</div>
+        </div>
     </body>
 
 </html>

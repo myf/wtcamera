@@ -12,7 +12,7 @@
             var dimention = 256;
             // event generated when video data comes from other user
             socket.on('updatevid', function(data){
-                    //console.log(data.length);
+                    //console.log(data);
                     // send the data to the incoming_video function to be processed and displayed
                     //incoming_video(data, dimention);
                     update_video(data, 'incoming_vid');

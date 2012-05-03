@@ -1,6 +1,7 @@
 Awesome Camera
 ================
-An real-time artsy display of reality in your browser requires low bandwidth
+
+A real-time artsy display of reality in your browser requires low bandwidth
 ------------------------------------------------------------------
 
 Background:

@@ -24,6 +24,7 @@
             //updating video from own computer
             var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                                navigator.mozGetUserMedia || navigator.msGetUserMedia;
+            console.log(getUserMedia)
             var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
             // collects data from webcam passes the stream data to the 
             getUserMedia.call(navigator, 'video', function(stream) {

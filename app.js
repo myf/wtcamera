@@ -1,6 +1,8 @@
 var express = require('express');
-var app = express.createServer();
-var io = require('socket.io').listen(app, { log: false });
+var app = express();
+var http = require('http');
+var server = http.createServer(app);
+var io = require('socket.io').listen(server, { log: false });
 
 app.listen(8888);
 
@@ -19,6 +21,9 @@ app.get('/', function(req, res){
     res.sendfile(__dirname + '/views/index.html');
 });
 
+app.get('/edgy', function(req, res){
+    res.sendfile(__dirname + '/views/edgy.html');
+});
 
 
 //server script

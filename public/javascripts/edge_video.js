@@ -1,9 +1,13 @@
-function update_video(data, canvas_id) {
+function update_video(data, canvas_id, decompress) {
     // output will display the processed webcam image from own computer
-    data = lzw_decode(data);
+    if (decompress === true) {
+        data = lzw_decode(data);
+    }
     var output = document.getElementById(canvas_id);
     var output_context = output.getContext('2d');
-    data = base64_to_bin(data,output.height);
+    if (decompress === true) {
+        data = base64_to_bin(data,output.height);
+    }
 
     // draw the data to the canvas
     var finalImage = output_context.createImageData(output.width,output.height);
@@ -68,9 +72,13 @@ function detect_edges(video_element,dim,threshold) {
             return x;
     });
     
-    result = bin_to_base64(result);
-    result = lzw_encode(result);
+    //result = bin_to_base64(result);
+    //result = lzw_encode(result);
     return result;
+}
+
+function compression (result) {
+    return lzw_encode(bin_to_base64(result));
 }
 
 function convolve (input, width, height, kernel,n_factor) {

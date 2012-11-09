@@ -26,7 +26,8 @@ io.sockets.on('connection', function(client) {
 
     client.on('sendframe', function(data){
         client.broadcast.emit('updatevid', data);
-        //console.log(JSON.stringify(data).slice(0,100));
+        //console.log((JSON.stringify(data)).length);
+        //console.log(data.length);
     });
 
 });

@@ -15,10 +15,7 @@
             var dimention = 256;
             // event generated when video data comes from other user
             socket.on('updatevid', function(data){
-                    //console.log(data);
-                    // send the data to the incoming_video function to be processed and displayed
-                    //incoming_video(data, dimention);
-                    update_video(data, 'incoming_vid');
+                update_video(data, 'incoming_vid',true);
             });
             
             //updating video from own computer
@@ -34,10 +31,11 @@
                     // attach the setInterval function to the window object
                     window.refresh = window.setInterval(function() {
                         // send the video data to other person
-                        var emit_data = detect_edges(video_element,dimention)
+                        var canvasarray = detect_edges(video_element,dimention)
+                        var emit_data = compression(canvasarray);
                         socket.emit('sendframe', emit_data);
                         // update the local canvas
-                        update_video(emit_data, 'output');
+                        update_video(canvasarray, 'output',false);
                         //update_video(detect_edges(video_element,dimention), 'output');
 
                         //var str_edata = Array.prototype.join.call(emit_data, "");
@@ -57,9 +55,11 @@
                         window.clearInterval(window.refresh);
 
                         window.refresh = setInterval(function() {
-                            var emit_data = detect_edges(video_element,dimention,ui.value);
+                            var canvasarray = detect_edges(video_element,dimention,ui.value)
+                            var emit_data = compression(canvasarray);
                             socket.emit('sendframe', emit_data);
-                            update_video(emit_data,'output');
+                            // update the local canvas
+                            update_video(canvasarray, 'output');
                         },200);
                     }
                 });

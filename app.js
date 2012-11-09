@@ -4,7 +4,7 @@ var http = require('http');
 var server = http.createServer(app);
 var io = require('socket.io').listen(server, { log: false });
 
-app.listen(8888);
+server.listen(8888);
 
 
 

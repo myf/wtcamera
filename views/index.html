@@ -27,7 +27,7 @@
             console.log(getUserMedia)
             var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
             // collects data from webcam passes the stream data to the 
-            getUserMedia.call(navigator, 'video', function(stream) {
+            navigator.webkitGetUserMedia({video:true}, function(stream) {
                     video_element = document.createElement('video');
                     video_element.src = URL.createObjectURL(stream);
                     video_element.play();

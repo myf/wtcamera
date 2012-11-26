@@ -13,6 +13,8 @@
             //socket init and update video upon receiving data
             var socket = io.connect();
             var dimention = 256;
+            var fps = 20;
+            var time_interval = 1000/fps;
             // event generated when video data comes from other user
             socket.on('updatevid', function(data){
                     //console.log(data);
@@ -24,7 +26,6 @@
             //updating video from own computer
             var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                                navigator.mozGetUserMedia || navigator.msGetUserMedia;
-            console.log(getUserMedia)
             var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
             // collects data from webcam passes the stream data to the 
             navigator.webkitGetUserMedia({video:true}, function(stream) {
@@ -35,14 +36,14 @@
                     // attach the setInterval function to the window object
                     window.refresh = window.setInterval(function() {
                         // send the video data to other person
-                        var emit_data = detect_edges(video_element,dimention)
+                        var emit_data = input_to_emit(video_element,dimention)
                         socket.emit('sendframe', emit_data);
                         // update the local canvas
                         update_video(emit_data, 'output');
                         //update_video(detect_edges(video_element,dimention), 'output');
 
                         //var str_edata = Array.prototype.join.call(emit_data, "");
-                    }, 200);
+                    }, time_interval);
 
             });
             
@@ -58,10 +59,10 @@
                         window.clearInterval(window.refresh);
 
                         window.refresh = setInterval(function() {
-                            var emit_data = detect_edges(video_element,dimention,ui.value);
+                            var emit_data = input_to_emit(video_element, dimention, ui.value)
                             socket.emit('sendframe', emit_data);
                             update_video(emit_data,'output');
-                        },200);
+                        },time_interval);
                     }
                 });
                 $( "#amount" ).val( $( "#slider" ).slider( "value" ) );

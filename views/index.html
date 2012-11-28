@@ -40,33 +40,34 @@
                         socket.emit('sendframe', emit_data);
                         // update the local canvas
                         update_video(emit_data, 'output');
+                        //update_colored_video(video_element, 'output');
                         //update_video(detect_edges(video_element,dimention), 'output');
 
                         //var str_edata = Array.prototype.join.call(emit_data, "");
                     }, time_interval);
 
+                    $( "#slider" ).slider({
+                        value:15,
+                        min: 1,
+                        max: 20,
+                        step: 1,
+                        slide: function( event, ui ) {
+                            $( "#amount" ).val( ui.value );
+                            window.clearInterval(window.refresh);
+
+                            window.refresh = setInterval(function() {
+                                var emit_data = input_to_emit(video_element, dimention, ui.value)
+                                socket.emit('sendframe', emit_data);
+                                update_video(emit_data,'output');
+                            },time_interval);
+                        }
+                    });
+                    $( "#amount" ).val( $( "#slider" ).slider( "value" ) );
+
+
             });
             
 
-            $(function() {
-                $( "#slider" ).slider({
-                    value:15,
-                    min: 1,
-                    max: 20,
-                    step: 1,
-                    slide: function( event, ui ) {
-                        $( "#amount" ).val( ui.value );
-                        window.clearInterval(window.refresh);
-
-                        window.refresh = setInterval(function() {
-                            var emit_data = input_to_emit(video_element, dimention, ui.value)
-                            socket.emit('sendframe', emit_data);
-                            update_video(emit_data,'output');
-                        },time_interval);
-                    }
-                });
-                $( "#amount" ).val( $( "#slider" ).slider( "value" ) );
-            });
         </script>
 
     </head>

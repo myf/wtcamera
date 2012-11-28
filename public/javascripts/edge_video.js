@@ -1,6 +1,19 @@
 //global vars
 _key_map = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
+function update_colored_video(video_element, canvas_id) {
+    // that comes from the webcam, unprocessed
+    var input, input_context, input_data;
+    // input is a hidden / undisplayed canvas ... it has the data
+    // that comes from the webcam, unprocessed
+
+    //TODO: do i need to create this element every time canvas refreshes
+    input = document.getElementById(canvas_id);
+    input_context = input.getContext('2d');
+    //draw input first
+    input_context.drawImage(video_element,0,0, input.width, input.height);
+}
+ 
 function update_video(data, canvas_id) {
     var output, output_context, finalImage, i;
     // output will display the processed webcam image from own computer
@@ -43,7 +56,10 @@ function input_to_data(video_element,dim) {
     // input is a hidden / undisplayed canvas ... it has the data
     // that comes from the webcam, unprocessed
     var input, input_context, input_data;
+    // input is a hidden / undisplayed canvas ... it has the data
+    // that comes from the webcam, unprocessed
 
+    //TODO: do i need to create this element every time canvas refreshes
     input = document.createElement('canvas');
     input.setAttribute('width', dim);
     input.setAttribute('height', dim);
@@ -51,6 +67,7 @@ function input_to_data(video_element,dim) {
     //draw input first
     input_context.drawImage(video_element,0,0, input.width, input.height);
     input_data = input_context.getImageData(0,0,input.width,input.height);
+    //TODO:return input_data.data
     return input_data;
 }
 
@@ -67,8 +84,6 @@ function detect_edges(input_data,dim,threshold) {
     //other vars
     var bw, i, smoothed, result_vertical, result_horizontal, result, t;
 
-    // input is a hidden / undisplayed canvas ... it has the data
-    // that comes from the webcam, unprocessed
     //black and whiting
     bw = new Uint8Array(dim*dim);
     for (i=0,data_length = input_data.data.length;i<data_length;i=i+4){
@@ -113,7 +128,8 @@ function convolve (input, width, height, kernel, n_factor) {
             sum =0;
             for (mj = 0;mj<kernel.length;mj++) {
                 for ( mi = 0;mi<kernel[0].length;mi++) {
-                    sum += kernel[mj][mi]*input[width*(j-height_offset+mj) +(i-width_offset+mi)];
+                    sum += kernel[mj][mi]*input[width*(j-height_offset+mj) 
+                        + (i-width_offset+mi)];
                     //console.log(kernel[mj][mi], input[width*j+i]);
                 }
             }
@@ -124,18 +140,6 @@ function convolve (input, width, height, kernel, n_factor) {
     }
     return output;
 }
-
-/*
-function apply_to_each_pixel (input, call) {
-    //isnt this just map
-    //the difference between this and map is that this alter the state
-    //..and map is purely functional
-    var j;
-    for ( j = 0; j<input.length; j++ ){
-            input[j] = call(input[j]);
-    }
-}
-*/
 
 Uint8Array.prototype.map = function(call) {
     var i, result = new Uint8Array(this.length);
@@ -224,7 +228,7 @@ String.prototype.times = function(n){
 }
 
 function base64_to_bin(base64,dim) {
-    var header, piece_string, result, i, j;
+    var piece_string, result, i, j;
     //header = "data:text/plain;charset=utf-8,";
     //base64 = base64.substr(header.length,base64.length);
     result = new Uint8Array(dim*dim);
@@ -247,7 +251,6 @@ function lzw_encode(s) {
     dict = {};
     data = (s + "").split("");
     out = [];
-    currChar;
     phrase = data[0];
     code = 256;
     for (i=1; i<data.length; i++) {

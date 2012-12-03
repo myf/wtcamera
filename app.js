@@ -1,8 +1,8 @@
-var express = require('express');
-var app = express();
-var http = require('http');
-var server = http.createServer(app);
-var io = require('socket.io').listen(server, { log: false });
+var express = require('express'),
+    app = express(),
+    http = require('http'),
+    server = http.createServer(app),
+    io = require('socket.io').listen(server, { log: false });
 
 server.listen(8888);
 
@@ -20,11 +20,6 @@ app.configure(function(){
 app.get('/', function(req, res){
     res.sendfile(__dirname + '/views/index.html');
 });
-
-app.get('/edgy', function(req, res){
-    res.sendfile(__dirname + '/views/edgy.html');
-});
-
 
 //server script
 io.sockets.on('connection', function(client) {

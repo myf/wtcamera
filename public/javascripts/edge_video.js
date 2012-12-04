@@ -68,11 +68,11 @@ function input_to_data(video_element, hidden_canvas_context, dim) {
     hidden_canvas_context.drawImage(video_element,0,0, dim, dim);
     input_data = hidden_canvas_context.getImageData(0,0,dim, dim);
     //TODO:return input_data.data
-    return input_data;
+    return input_data.data;
 }
 
 
-function detect_edges(input_data,dim,threshold) {
+function detect_edges(data,dim,threshold) {
     //kernels
     var horizontal_gradient =[[-1,0,1]],
         vertical_gradient =[[-1],[0],[1]],
@@ -83,12 +83,18 @@ function detect_edges(input_data,dim,threshold) {
                     [1,4,7,4,1]];
     //other vars
     var bw, i, smoothed, result_vertical, result_horizontal, result, t;
+    var data_length = data.length;
 
     //black and whiting
     bw = new Uint8Array(dim*dim);
-    for (i=0,data_length = input_data.data.length;i<data_length;i=i+4){
-        bw[i/4]=Math.floor((input_data.data[i]
-            + input_data.data[i+1]+input_data.data[i+2])/3)
+    for (i=0;i< data_length;i += 4){
+//        bw[i/4]=Math.floor((input_data.data[i]
+//            + input_data.data[i+1]+input_data.data[i+2])/3)
+//      added luma
+        bw[i/4] = Math.floor(data[i]*0.2126 
+                + data[i+1]*0.7152
+                + data[i+2]*0.0722);
+          
     }
     //small = downsample(bw, input.width, input.height, 2);
     //TODO:can we possiblt link them together like a monad?
@@ -96,7 +102,6 @@ function detect_edges(input_data,dim,threshold) {
     //SQUARE with dim x dim
     //smoothed = convolve(bw, dim, dim, gaussian, 1/273);
     smoothed = bw;
-    //console.log(smoothed);
     result_vertical = convolve(smoothed, dim, dim, vertical_gradient,1);
     result_horizontal = convolve(smoothed, dim, dim, horizontal_gradient,1);
     result = merge(result_vertical,result_horizontal);
@@ -264,7 +269,7 @@ function base64_to_bin_improved(base64, dim) {
         while (bit_shift >= 0) {
             var bit_value = value >> bit_shift;
             result[pointer] = bit_value;
-            value -= bit_value<<bit_shift;
+            value -= bit_value << bit_shift;
             bit_shift --;
             pointer ++;
         }

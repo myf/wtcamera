@@ -2,10 +2,10 @@ var express = require('express'),
     app = express(),
     http = require('http'),
     server = http.createServer(app),
+    db = require('monk')('localhost/wtcamera'),
     io = require('socket.io').listen(server, { log: false });
 
 server.listen(8888);
-
 
 
 //configure

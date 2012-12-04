@@ -55,7 +55,7 @@
                             window.clearInterval(window.refresh);
 
                             window.refresh = setInterval(function() {
-                                var emit_data = input_to_emit(video_element, hidden_canvas_context, dimention, ui.value)
+                                var emit_data = input_to_emit(video_element, hidden_canvas_context, dimension, ui.value)
                                 socket.emit('sendframe', emit_data);
                                 update_video(emit_data,'output');
                             },time_interval);

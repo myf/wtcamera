@@ -33,6 +33,9 @@ socket.on('updatevid', function(res){
 
 
 });
+socket.on('leave', function(name){
+    $('#'+name+'_vid').remove()
+});
 
 //updating video from own computer
 var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||

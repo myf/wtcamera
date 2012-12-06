@@ -51,6 +51,7 @@ io.sockets.on('connection', function(client) {
     client.on('disconnect', function(res){
         client.get('name',function(err, name){
             users.remove({name:name});
+            client.broadcast.emit('leave',name);
         });
         
     });

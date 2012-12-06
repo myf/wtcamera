@@ -5,9 +5,12 @@ var express = require('express'),
     db = require('monk')('localhost/wtcamera'),
     users = db.get("users"),
     PORT = process.env.PORT || 8888,
+    _ = require('underscore'),
     io = require('socket.io').listen(server, { log: false });
 
 server.listen(PORT);
+//flush out old db
+users.remove()
 
 //configure
 exp_server.configure(function(){
@@ -27,7 +30,7 @@ io.sockets.on('connection', function(client) {
         //check validity
         if ((name !== null) && (name !=='')) {
             //check uniqueness
-            users.findOne({name:name}) .on('success', function(doc){
+            users.findOne({name:name}).on('success', function(doc){
                 //check if this thing exist
                 if (doc === null) {
                     users.insert({name:name}, function(){
@@ -55,4 +58,17 @@ io.sockets.on('connection', function(client) {
         
     });
 
+    client.on("polling_list", function() {
+        users.find().on('success', function(doc){
+            console.log(_.pluck(doc,"name"))
+            client.emit("SOW", _.pluck(doc,"name"));
+        });
+    });
+
+        //state of the world
+        //client.broadcast.emit('SOW', users
 });
+
+    
+    
+

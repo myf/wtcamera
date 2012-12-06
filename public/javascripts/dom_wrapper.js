@@ -1,9 +1,10 @@
 //socket init and update video upon receiving data
 var socket = io.connect();
 var dimension = 256;
-var fps = 12;
+var fps = 15;
 var time_interval = 1000/fps;
 var username;
+var user_list = [];
 // event generated when video data comes from other user
 // send the data to the incoming_video function to be processed and displayed
 socket.on('connect', function() {
@@ -17,22 +18,61 @@ socket.on('connect', function() {
         username = name;
     });
 });
+//TODO: it shouldn't check validity everytime
+//polling every 2 second?
+//or trying to get a long polling that sends the users to everone
 socket.on('updatevid', function(res){
     var user = res.name;
-    var user_canvas = user+'_vid';
+    var user_canvas = user + '_vid';
+    console.log(user_list)
     if (user === username) {
         return;
-    } else if ($('#'+user_canvas).get(0)) {
+    } else if ($.inArray(user, user_list)===0) {
         update_video(res.data, user_canvas);
     } else {
-        $("#canvas_area").append(
-            '<canvas class="pull-left" id="'+user_canvas+'" width="'
-                + dimension +'" height="' + dimension +'"> </canvas>'
-            );
+        return;
     }
-
-
 });
+
+function add_canvas_list(user) {
+    var user_canvas = user + '_vid';
+    $("#canvas_area").append(
+        '<canvas class="pull-left" id="'+user_canvas+'" width="'
+            + dimension +'" height="' + dimension +'"> </canvas>'
+        );
+}
+
+function remove_canvas_list(user) {
+    var user_canvas = user + '_vid';
+    $('#'+user_canvas).remove();
+}
+
+
+socket.on('SOW', function(list) {
+    console.log(list);
+    if (list === user_list) {
+        return;
+    } else {
+        for (var i = 0; i < list.length; i++) {
+            if ($.inArray(list[i],user_list)===-1) {
+                if(list[i]!==username) {
+                    add_canvas_list(list[i]);
+                }
+            }
+        }
+        for (var i = 0; i < user_list.length; i++) {
+            if($.inArray(user_list[i],list)===-1) {
+                if (user_list[i]!==username) {
+                    remove_canvas_list(user_list[i]);
+                }
+            }
+        }
+        user_list = list;
+    }
+});
+                
+                
+    
 
 //updating video from own computer
 var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||

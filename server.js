@@ -8,6 +8,8 @@ var express = require('express'),
     io = require('socket.io').listen(server, { log: false });
 
 server.listen(PORT);
+//remove remainder db
+users.remove();
 
 //configure
 exp_server.configure(function(){

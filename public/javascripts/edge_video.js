@@ -106,9 +106,15 @@ function detect_edges(data,dim,threshold) {
     result_horizontal = convolve(smoothed, dim, dim, horizontal_gradient,1);
     result = merge(result_vertical,result_horizontal);
     //result = convolve(result, dim, dim, gaussian, 1/273)
+//    var temp = new Uint8Array(dim*dim);
+//    var t = threshold || 15;
+//    for (var i = 0; i < result.length; i++ ) {
+//        if (result[i] > t) { temp[i] = 0; }
+//        else {temp[i] = 1;}
+//    }
+//    result = temp;
     result = result.map(function (x) {
-        //reverse threshold
-        t = threshold || 15;
+        var t = threshold || 15;
         if (x>t) { x = 0; }
         else{ x=1; }
         return x;
@@ -117,14 +123,6 @@ function detect_edges(data,dim,threshold) {
     result = bin_to_base64(result);
     result = lzw_encode(result);
     return result;
-//    var temp = new Uint8Array(dim*dim);
-//    var t = threshold || 15;
-//    //in-line loop instead of func call for performance
-//    for (var i = 0; i < result.length; i++ ) {
-//        if (result[i] > t) { temp[i] = 0; }
-//        else {temp[i] = 1;}
-//    }
-//    result = temp;
 }
 
 function convolve (input, width, height, kernel, n_factor) {
@@ -242,6 +240,15 @@ String.prototype.times = function(n){
     return result;
 }
 
+function string_dict(string) {
+    dict = {};
+    for (var m = 0; m < string.length; m++) {
+        dict[string[m]]=m;
+    };
+    return dict;
+};
+_key_dict = string_dict(_key_map);
+
 function base64_to_bin(base64,dim) {
     var piece_string, result, i, j;
     //header = "data:text/plain;charset=utf-8,";
@@ -264,7 +271,8 @@ function base64_to_bin_improved(base64, dim) {
     var result = new Uint8Array(dim*dim);
     var pointer = 0;
     for (var i = 0;i < base64.length; i++) {
-        var value = _key_map.indexOf(base64[i]);
+        var value = _key_dict[base64[i]];
+        //var value = _key_map.indexOf(base64[i]);
         var bit_shift = 5;
         while (bit_shift >= 0) {
             var bit_value = value >> bit_shift;

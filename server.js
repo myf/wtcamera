@@ -4,7 +4,7 @@ var express = require('express'),
     server = http.createServer(exp_server),
     db = require('monk')('localhost/wtcamera'),
     users = db.get("users"),
-    PORT = process.env.PORT || 8888,
+    PORT = process.env.PORT || 8888;
     io = require('socket.io').listen(server, { log: false });
 
 server.listen(PORT);

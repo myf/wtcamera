@@ -1,11 +1,12 @@
 //socket init and update video upon receiving data
 var socket = io.connect();
 var dimension = 256;
-var fps = 12;
+var fps = 15;
 var time_interval = 1000/fps;
 var username;
 // event generated when video data comes from other user
 // send the data to the incoming_video function to be processed and displayed
+///////////////////////////////////////////////////////////////////////
 socket.on('connect', function() {
     socket.emit('set nickname', prompt('get yourself a name'));
     socket.on('user_exist', function(name) {
@@ -36,6 +37,7 @@ socket.on('updatevid', function(res){
 socket.on('leave', function(name){
     $('#'+name+'_vid').remove()
 });
+///////////////////////////////////////////////////////////////////////
 
 //updating video from own computer
 var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||

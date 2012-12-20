@@ -1,88 +1,27 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script type="text/javascript" src="/javascripts/edge_video.js"></script>
+        <script src="/js/edge_video.js"></script>
         <script src="/socket.io/socket.io.js"></script>
-        <script type="text/javascript" src="/javascripts/jquery-1.7.2.min.js"></script>
-        <script type="text/javascript" src="/javascripts/jquery-ui-1.8.19.custom.min.js"></script>
-        <script type="text/javascript" src="/javascripts/bootstrap.min.js"></script>
+        <script src="/js/jquery-1.7.2.min.js"></script>
+        <script src="/js/jquery-ui-1.8.19.custom.min.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
 
         <link rel="stylesheet" href="/css/ui-lightness/jquery-ui-1.8.19.custom.css">
         <link rel="stylesheet" href="/css/bootstrap.min.css">
-        <script type="text/javascript">
-            //socket init and update video upon receiving data
-            var socket = io.connect();
-            var dimention = 256;
-            // event generated when video data comes from other user
-            socket.on('updatevid', function(data){
-                    //console.log(data);
-                    // send the data to the incoming_video function to be processed and displayed
-                    //incoming_video(data, dimention);
-                    update_video(data, 'incoming_vid');
-            });
-            
-            //updating video from own computer
-            var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
-                               navigator.mozGetUserMedia || navigator.msGetUserMedia;
-            var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
-            // collects data from webcam passes the stream data to the 
-            getUserMedia.call(navigator, 'video', function(stream) {
-                    video_element = document.createElement('video');
-                    video_element.src = URL.createObjectURL(stream);
-                    video_element.play();
-
-                    // attach the setInterval function to the window object
-                    window.refresh = window.setInterval(function() {
-                        // send the video data to other person
-                        var emit_data = detect_edges(video_element,dimention)
-                        socket.emit('sendframe', emit_data);
-                        // update the local canvas
-                        update_video(emit_data, 'output');
-                        //update_video(detect_edges(video_element,dimention), 'output');
-
-                        //var str_edata = Array.prototype.join.call(emit_data, "");
-                    }, 200);
-
-            });
-            
-
-            $(function() {
-                $( "#slider" ).slider({
-                    value:15,
-                    min: 1,
-                    max: 20,
-                    step: 1,
-                    slide: function( event, ui ) {
-                        $( "#amount" ).val( ui.value );
-                        window.clearInterval(window.refresh);
-
-                        window.refresh = setInterval(function() {
-                            var emit_data = detect_edges(video_element,dimention,ui.value);
-                            socket.emit('sendframe', emit_data);
-                            update_video(emit_data,'output');
-                        },200);
-                    }
-                });
-                $( "#amount" ).val( $( "#slider" ).slider( "value" ) );
-            });
-        </script>
-
     </head>
     <body>
-        
-
+        <script src="/js/dom_wrapper.js"></script>
         <div class="navbar navbar-fixed-top">
           <div class="navbar-inner">
             <div class="container">
               <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                 <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
               </a>
-              <a class="brand" href="#">Awesome Camera</a>
+              <a class="brand" href="http://worldtalks.org">WorldTalks Camera</a>
               <div class="nav-collapse">
                 <ul class="nav">
-                  <li class="active"><a href="#">here</a></li>
+                  <li class="active"><a href="#">"video"</a></li>
                   <li><a href="#about">why</a></li>
                   <li><a href="#contact">contact</a></li>
                 </ul>
@@ -92,28 +31,19 @@
         </div>
 
         <div class="container">
-            
-            <div style="clear:both">&nbsp;</div>
-            <div style="clear:both">&nbsp;</div>
-            <div style="clear:both">&nbsp;</div>
 
-                <!--
-                <canvas id="input" width="256" height="256" style="visibility:hidden"> </canvas>
-                -->
-            <div class="row">
-            <div class="span6"><canvas class="pull-right" id="output" width="256" height="256"> </canvas></div>
-            <div class="span6"><canvas class="pull-left" id="incoming_vid" width="256" height="256"> </canvas></div>
+            <div id="canvas_area">
             </div>
-            <!-- Slider -->
-            <div class="demo">
+        </div>
 
+            <div class="container">
+
+                <div id="slider"></div>
             <p>
                 <label for="amount">threshhold</label>
                 <input type="text" id="amount" style="border:0; color:#f6931f; font-weight:bold;" />
             </p>
 
-            <div id="slider"></div>
-            <div style="clear:both">&nbsp;</div>
         </div>
     </body>
 

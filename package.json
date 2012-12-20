@@ -1,9 +1,13 @@
 {
-    "name": "vid_server",
+    "name": "wtcamera",
     "description": "a server for compressed video chatting",
     "version": "0.0.1",
+    "main": "server.js",
     "dependencies": {
-        "express": ">= 2.4.6",
-        "socket.io": ">= 0.8.4"
+        "express": "*",
+        "socket.io": "*",
+        "jquery":"*",
+        "monk":"*",
+        "underscore":"*"
     }
 }

@@ -67,7 +67,6 @@ function input_to_data(video_element, hidden_canvas_context, dim) {
     // that comes from the webcam, unprocessed
     hidden_canvas_context.drawImage(video_element,0,0, dim, dim);
     input_data = hidden_canvas_context.getImageData(0,0,dim, dim);
-    //TODO:return input_data.data
     return input_data.data;
 }
 

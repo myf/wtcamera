@@ -7,11 +7,11 @@
         <script src="/js/jquery-ui-1.8.19.custom.min.js"></script>
         <script src="/js/bootstrap.min.js"></script>
 
+        <link rel="stylesheet" href="/css/talks.css">
         <link rel="stylesheet" href="/css/ui-lightness/jquery-ui-1.8.19.custom.css">
         <link rel="stylesheet" href="/css/bootstrap.min.css">
     </head>
     <body>
-        <script src="/js/dom_wrapper.js"></script>
         <div class="navbar navbar-fixed-top">
           <div class="navbar-inner">
             <div class="container">
@@ -30,21 +30,40 @@
           </div>
         </div>
 
-        <div class="container">
+        <div class='below span16 row'>
+            <div class="span12 pull-left">
+        
+                <div class="row-fluid">
 
-            <div id="canvas_area">
+                    <div id="canvas_area">
+                    </div>
+                </div>
+
+                <div class="row-fluid">
+
+                    <div id="slider"></div>
+                    <p>
+                        <label for="amount">threshhold</label>
+                        <input type="text" id="amount" style="border:0; color:#f6931f; font-weight:bold;" />
+                    </p>
+
+                </div>
             </div>
+
+            <div class="span3 pull-right">
+
+                <div class='container chat_area'>
+                    <textarea id="agg_chat"></textarea>
+                </div>
+                <div class='container text_input'>
+                    <input type="text" id="chat_input"></input>
+                </div>
+            </div>
+            </div>
+
         </div>
+        <script src="/js/dom_wrapper.js"></script>
 
-            <div class="container">
-
-                <div id="slider"></div>
-            <p>
-                <label for="amount">threshhold</label>
-                <input type="text" id="amount" style="border:0; color:#f6931f; font-weight:bold;" />
-            </p>
-
-        </div>
     </body>
 
 </html>

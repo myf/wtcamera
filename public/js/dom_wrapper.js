@@ -40,6 +40,30 @@ socket.on('updatevid', function(res){
 socket.on('leave', function(name){
     $('#'+name+'_vid').remove()
 });
+
+socket.on('updatetext', function(res){
+    var user = res.name;
+    var message = res.data;
+    update_line('#agg_chat',user,message);
+});
+
+
+///////////////////////////////////////////////////////
+//text chats
+$('#chat_input').keypress(function(e){
+    if (e.keyCode===13) {
+        var message = $('#chat_input').val();
+        $('#chat_input').val('');
+        update_line('#agg_chat',username,message);
+        socket.emit('sendtext',{name:username, data:message})
+    }
+})
+
+function update_line(loc,name,message){
+    $(loc).append(name+': ')
+    $(loc).append(message)
+    $(loc).append('\n')
+}
 ///////////////////////////////////////////////////////////////////////
 
 //updating video from own computer
@@ -75,7 +99,7 @@ navigator.webkitGetUserMedia({video:true}, function(stream) {
         $( "#slider" ).slider({
             value:15,
             min: 1,
-            max: 20,
+            max: 30,
             step: 1,
             slide: function( event, ui ) {
                 $( "#amount" ).val( ui.value );
@@ -85,5 +109,4 @@ navigator.webkitGetUserMedia({video:true}, function(stream) {
         });
         $( "#amount" ).val( $( "#slider" ).slider( "value" ) );
 });
-
 

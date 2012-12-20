@@ -50,6 +50,10 @@ io.sockets.on('connection', function(client) {
         client.broadcast.emit('updatevid', res);
     });
 
+    client.on('sendtext', function(res){
+        client.broadcast.emit('updatetext',res);
+    });
+
     client.on('disconnect', function(res){
         client.get('name',function(err, name){
             users.remove({name:name});

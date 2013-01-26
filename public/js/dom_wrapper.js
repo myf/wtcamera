@@ -85,16 +85,16 @@ navigator.webkitGetUserMedia({video:true}, function(stream) {
         creating_canvas('own_video',dimension);
         var hidden_canvas_context = prepare_hidden_canvas(dimension);
 
-        function frame_loop(threshold) {
-            window.refresh = setInterval(function() {
-                var emit_data = input_to_emit(video_element, 
-                    hidden_canvas_context, dimension, threshold);
-                socket.emit('sendframe', {name:username, data:emit_data});
-                update_video(emit_data,'own_video');
-            },time_interval);
+        function frame_loop() {
+            var threshold = 15;
+            var emit_data = input_to_emit(video_element, 
+                hidden_canvas_context, dimension, threshold);
+            socket.emit('sendframe', {name:username, data:emit_data});
+            update_video(emit_data,'own_video');
+            requestAnimationFrame(frame_loop);
         }
         // attach the setInterval function to the window object
-        frame_loop();
+        requestAnimationFrame(frame_loop);
 
         $( "#slider" ).slider({
             value:15,
@@ -103,8 +103,7 @@ navigator.webkitGetUserMedia({video:true}, function(stream) {
             step: 1,
             slide: function( event, ui ) {
                 $( "#amount" ).val( ui.value );
-                window.clearInterval(window.refresh);
-                frame_loop(ui.value);
+                requestAnimationFrame(frame_loop);
             }
         });
         $( "#amount" ).val( $( "#slider" ).slider( "value" ) );

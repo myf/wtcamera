@@ -7,7 +7,6 @@ function update_colored_video(video_element, canvas_id) {
     // input is a hidden / undisplayed canvas ... it has the data
     // that comes from the webcam, unprocessed
 
-    //TODO: do i need to create this element every time canvas refreshes
     input = document.getElementById(canvas_id);
     input_context = input.getContext('2d');
     //draw input first
@@ -98,7 +97,6 @@ function detect_edges(data,dim,threshold) {
     //small = downsample(bw, input.width, input.height, 2);
     //TODO:can we possiblt link them together like a monad?
     //TODO:can we give width / length more convinient  style other than a 
-    //SQUARE with dim x dim
     //smoothed = convolve(bw, dim, dim, gaussian, 1/273);
     smoothed = bw;
     result_vertical = convolve(smoothed, dim, dim, vertical_gradient,1);

@@ -6,6 +6,12 @@ var time_interval = 1000/fps;
 var username;
 // event generated when video data comes from other user
 // send the data to the incoming_video function to be processed and displayed
+function creating_canvas(name,dimention) {
+    $("#canvas_area").append(
+        '<canvas class="pull-left" id="'+name+'" width="'
+            + dimension +'" height="' + dimension +'"> </canvas>'
+        );
+}
 ///////////////////////////////////////////////////////////////////////
 socket.on('connect', function() {
     socket.emit('set nickname', prompt('get yourself a name'));
@@ -26,10 +32,7 @@ socket.on('updatevid', function(res){
     } else if ($('#'+user_canvas).get(0)) {
         update_video(res.data, user_canvas);
     } else {
-        $("#canvas_area").append(
-            '<canvas class="pull-left" id="'+user_canvas+'" width="'
-                + dimension +'" height="' + dimension +'"> </canvas>'
-            );
+        creating_canvas(user_canvas,dimension);
     }
 
 
@@ -37,56 +40,74 @@ socket.on('updatevid', function(res){
 socket.on('leave', function(name){
     $('#'+name+'_vid').remove()
 });
+
+socket.on('updatetext', function(res){
+    var user = res.name;
+    var message = res.data;
+    update_line('#agg_chat',user,message);
+});
+
+
+///////////////////////////////////////////////////////
+//text chats
+$('#chat_input').keypress(function(e){
+    if (e.keyCode===13) {
+        var message = $('#chat_input').val();
+        $('#chat_input').val('');
+        update_line('#agg_chat',username,message);
+        socket.emit('sendtext',{name:username, data:message})
+    }
+})
+
+function update_line(loc,name,message){
+    $(loc).append(name+': ')
+    $(loc).append(message)
+    $(loc).append('\n')
+}
 ///////////////////////////////////////////////////////////////////////
 
 //updating video from own computer
 var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                    navigator.mozGetUserMedia || navigator.msGetUserMedia;
 var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+var requestAnimationFrame = window.webkitRequestAnimationFrame ||
+                            window.mozRequestAnimationFrame ||
+                            window.msRequestAnimationFrame;
 // collects data from webcam passes the stream data to the 
-navigator.webkitGetUserMedia({video:true}, function(stream) {
+
+
+
+navigator.webkitGetUserMedia({video:true, audio:true}, function(stream) {
         video_element = document.createElement('video');
         video_element.src = URL.createObjectURL(stream);
         video_element.play();
         //locally add canvas
-        $("#canvas_area").append(
-            '<canvas class="pull-left" id="own_video" width="'
-                + dimension +'" height="' + dimension +'"> </canvas>'
-            );
+        creating_canvas('own_video',dimension);
+        var hidden_canvas_context = prepare_hidden_canvas(dimension);
 
+        function frame_loop() {
+            var threshold = 15;
+            var emit_data = input_to_emit(video_element, 
+                hidden_canvas_context, dimension, threshold);
+            socket.emit('sendframe', {name:username, data:emit_data});
+            update_video(emit_data,'own_video');
+            setTimeout(function(){
+              requestAnimationFrame(frame_loop);
+            }, time_interval);
+        }
         // attach the setInterval function to the window object
-        var hidden_canvas_context = prepare_hidden_canvas(dimension)
-        window.refresh = window.setInterval(function() {
-            // send the video data to other person
-            var emit_data = input_to_emit(video_element,
-                hidden_canvas_context,dimension);
-            socket.emit('sendframe', {name:username,data:emit_data});
-            // update the local canvas
-            update_video(emit_data, 'own_video');
-            //update_colored_video(video_element, 'output');
-            //update_video(detect_edges(video_element,dimention), 'output');
-
-            //var str_edata = Array.prototype.join.call(emit_data, "");
-        }, time_interval);
+        requestAnimationFrame(frame_loop);
 
         $( "#slider" ).slider({
             value:15,
             min: 1,
-            max: 20,
+            max: 30,
             step: 1,
             slide: function( event, ui ) {
                 $( "#amount" ).val( ui.value );
-                window.clearInterval(window.refresh);
-
-                window.refresh = setInterval(function() {
-                    var emit_data = input_to_emit(video_element, 
-                        hidden_canvas_context, dimension, ui.value);
-                    socket.emit('sendframe', {name:username,data:emit_data});
-                    update_video(emit_data,'own_video');
-                },time_interval);
+                requestAnimationFrame(frame_loop);
             }
         });
         $( "#amount" ).val( $( "#slider" ).slider( "value" ) );
 });
-
 

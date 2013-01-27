@@ -26,7 +26,7 @@ exp_server.get('/', function(req, res){
 io.sockets.on('connection', function(client) {
 
     client.on('set nickname', function(name) {
-        setname(name);
+        setname(client, name);
 
         //check validity
         
@@ -53,7 +53,7 @@ io.sockets.on('connection', function(client) {
 
 });
 
-function setname(name){
+function setname(client, name){
     if ((name !== null) && (name !=='')) {
         //check uniqueness
         users.findOne({name:name}) .on('success', function(doc){

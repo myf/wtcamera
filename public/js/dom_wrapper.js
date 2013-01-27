@@ -77,7 +77,7 @@ var requestAnimationFrame = window.webkitRequestAnimationFrame ||
 
 
 
-navigator.webkitGetUserMedia({video:true}, function(stream) {
+navigator.webkitGetUserMedia({video:true, audio:true}, function(stream) {
         video_element = document.createElement('video');
         video_element.src = URL.createObjectURL(stream);
         video_element.play();
@@ -91,7 +91,9 @@ navigator.webkitGetUserMedia({video:true}, function(stream) {
                 hidden_canvas_context, dimension, threshold);
             socket.emit('sendframe', {name:username, data:emit_data});
             update_video(emit_data,'own_video');
-            requestAnimationFrame(frame_loop);
+            setTimeout(function(){
+              requestAnimationFrame(frame_loop);
+            }, time_interval);
         }
         // attach the setInterval function to the window object
         requestAnimationFrame(frame_loop);

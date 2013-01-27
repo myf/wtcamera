@@ -26,21 +26,10 @@ exp_server.get('/', function(req, res){
 io.sockets.on('connection', function(client) {
 
     client.on('set nickname', function(name) {
+        setname(client, name);
+
         //check validity
-        if ((name !== null) && (name !=='')) {
-            //check uniqueness
-            users.findOne({name:name}) .on('success', function(doc){
-                //check if this thing exist
-                if (doc === null) {
-                    users.insert({name:name}, function(){
-                        client.set('name',name);
-                        client.emit('user_success',name);
-                    });
-                }else {
-                    client.emit('user_exist',name);
-                }
-            })
-        }
+        
 //        client.set('nickname', name, function () {
 //            client.emit('ready');
 //        });
@@ -48,6 +37,10 @@ io.sockets.on('connection', function(client) {
 
     client.on('sendframe', function(res){
         client.broadcast.emit('updatevid', res);
+    });
+
+    client.on('sendtext', function(res){
+        client.broadcast.emit('updatetext',res);
     });
 
     client.on('disconnect', function(res){
@@ -59,3 +52,20 @@ io.sockets.on('connection', function(client) {
     });
 
 });
+
+function setname(client, name){
+    if ((name !== null) && (name !=='')) {
+        //check uniqueness
+        users.findOne({name:name}) .on('success', function(doc){
+            //check if this thing exist
+            if (doc === null) {
+                users.insert({name:name}, function(){
+                    client.set('name',name);
+                    client.emit('user_success',name);
+                });
+            }else {
+                client.emit('user_exist',name);
+            }
+        })
+    }
+}

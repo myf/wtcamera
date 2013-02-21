@@ -4,6 +4,10 @@ worldtalks camera
 A real-time video chat in your browser requiring low bandwidth
 ------------------------------------------------------------------
 
+<pre>
+Author, myf <echo bXlmQHdvcmxkdGFsa3Mub3JnCg== |base64 -d>
+</pre>
+
 Background:
 ------------
 We are trying to explore different compression algorithms that allows us to do

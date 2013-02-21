@@ -5,7 +5,7 @@ A real-time video chat in your browser requiring low bandwidth
 ------------------------------------------------------------------
 
 <pre>
-Author, myf <echo bXlmQHdvcmxkdGFsa3Mub3JnCg== |base64 -d>
+Author, myf: "<echo bXlmQHdvcmxkdGFsa3Mub3JnCg== |base64 -d>"
 </pre>
 
 Background:

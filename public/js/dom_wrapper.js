@@ -67,8 +67,8 @@ function update_line(loc,name,message){
 ///////////////////////////////////////////////////////////////////////
 
 //updating video from own computer
-var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
-                   navigator.mozGetUserMedia || navigator.msGetUserMedia;
+navigator.getMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                   navigator.mozGetUserMedia || navigator.msGetUserMedia);
 var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
 var requestAnimationFrame = window.webkitRequestAnimationFrame ||
                             window.mozRequestAnimationFrame ||
@@ -76,8 +76,7 @@ var requestAnimationFrame = window.webkitRequestAnimationFrame ||
 // collects data from webcam passes the stream data to the 
 
 
-
-navigator.webkitGetUserMedia({video:true, audio:true}, function(stream) {
+navigator.getMedia({video:true, audio:true}, function(stream) {
         video_element = document.createElement('video');
         video_element.src = URL.createObjectURL(stream);
         video_element.play();
@@ -109,5 +108,7 @@ navigator.webkitGetUserMedia({video:true, audio:true}, function(stream) {
             }
         });
         $( "#amount" ).val( $( "#slider" ).slider( "value" ) );
+        }, function(err){
+          console.log("error occured: " + err);
 });
 
